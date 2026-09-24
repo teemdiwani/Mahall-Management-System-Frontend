@@ -244,7 +244,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.fajr}
                   onChange={(e) => setFormData({ ...formData, fajr: e.target.value })}
                   placeholder="05:15 AM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -255,7 +255,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.dhuhr}
                   onChange={(e) => setFormData({ ...formData, dhuhr: e.target.value })}
                   placeholder="12:35 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -266,7 +266,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.asr}
                   onChange={(e) => setFormData({ ...formData, asr: e.target.value })}
                   placeholder="04:15 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -277,7 +277,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.maghrib}
                   onChange={(e) => setFormData({ ...formData, maghrib: e.target.value })}
                   placeholder="06:35 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -288,7 +288,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.isha}
                   onChange={(e) => setFormData({ ...formData, isha: e.target.value })}
                   placeholder="08:00 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -299,7 +299,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.jumah}
                   onChange={(e) => setFormData({ ...formData, jumah: e.target.value })}
                   placeholder="12:45 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
             </div>
@@ -318,7 +318,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.khatib}
                   onChange={(e) => setFormData({ ...formData, khatib: e.target.value })}
                   placeholder="Usthad Abdullah Faizy"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -329,7 +329,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.topic}
                   onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
                   placeholder="Mutual Support and Brotherhood"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -340,7 +340,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.khutbahTime}
                   onChange={(e) => setFormData({ ...formData, khutbahTime: e.target.value })}
                   placeholder="12:30 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
               <div>
@@ -351,7 +351,7 @@ export const MosquePrayerPage: React.FC = () => {
                   value={formData.prayerTime}
                   onChange={(e) => setFormData({ ...formData, prayerTime: e.target.value })}
                   placeholder="01:00 PM"
-                  className="w-full px-3 py-2 border rounded-xl text-sm dark:bg-neutral-900 dark:border-neutral-700"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-xl text-sm font-semibold shadow-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 placeholder:text-gray-400 dark:bg-neutral-100 dark:text-neutral-900 dark:border-neutral-300"
                 />
               </div>
             </div>

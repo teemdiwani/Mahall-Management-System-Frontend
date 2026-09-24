@@ -7,6 +7,7 @@ import Card from '../../../components/ui/Card';
 import { PaymentStatusBadge, ApplicationStatusBadge } from '../../../components/ui/Badge';
 import { StatCard } from '../../../components/ui/EmptyState';
 import { dashboardApi } from '../../../api/dashboardApi';
+import MadrasaParentPortalSection from '../../../components/madrasa/MadrasaParentPortalSection';
 
 const MemberDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -89,6 +90,11 @@ const MemberDashboard: React.FC = () => {
           iconBg="bg-teal-50 text-teal-600"
           subtitle="Community calendar"
         />
+      </div>
+
+      {/* Madrasa Parent Portal Section (Dynamically displayed ONLY when member's children study in Mahallu Madrasa) */}
+      <div className="mb-6">
+        <MadrasaParentPortalSection />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">

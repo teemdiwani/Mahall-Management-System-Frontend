@@ -239,54 +239,57 @@ export interface MosqueProgram {
 // ============================================================
 // Madrasa
 // ============================================================
-export interface MadrasaClass {
-  id: string;
+export interface Madrasa {
+  _id: string;
+  id?: string;
   name: string;
-  teacher: string;
-  teacherId: string;
-  room: string;
-  schedule: string;
-  studentCount: number;
+  code: string;
+  regNumber?: string;
+  board: string;
+  location: string;
+  establishedYear?: number;
+  sadarUsthad: string;
+  phone: string;
+  email?: string;
+  timings?: string;
+  status: 'ACTIVE' | 'INACTIVE';
+  description?: string;
+  studentCount?: number;
+  usthadCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface MadrasaStudent {
-  id: string;
+  _id?: string;
+  id?: string;
+  admissionNumber?: string;
   name: string;
-  familyId: string;
-  familyName: string;
-  classId: string;
-  className: string;
+  madrasaId?: any;
+  familyId?: any;
+  familyName?: string;
   dateOfBirth: string;
   gender: Gender;
-  enrolledAt: string;
-  feeStatus: PaymentStatus;
-  attendancePercent: number;
+  enrolledAt?: string;
   guardianName: string;
   guardianPhone: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'GRADUATED';
 }
 
 export interface MadrasaTeacher {
-  id: string;
+  _id?: string;
+  id?: string;
+  madrasaId?: any;
   name: string;
+  designation?: string;
   qualification: string;
-  subject: string;
+  subjects?: string[];
+  subject?: string;
   phone: string;
   email?: string;
-  joinedAt: string;
-  classIds: string[];
-}
-
-export interface ExamResult {
-  id: string;
-  studentId: string;
-  studentName: string;
-  classId: string;
-  examName: string;
-  subject: string;
-  marks: number;
-  totalMarks: number;
-  grade: string;
-  date: string;
+  joiningDate?: string;
+  joinedAt?: string;
+  status?: 'ACTIVE' | 'INACTIVE';
 }
 
 // ============================================================

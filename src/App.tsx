@@ -19,6 +19,7 @@ import ContactPage from './pages/public/ContactPage';
 // Auth Pages
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 
 // Dashboard — Main Router
 import DashboardRouter from './pages/dashboard/DashboardRouter';
@@ -44,11 +45,16 @@ import BeneficiariesPage from './pages/dashboard/welfare/BeneficiariesPage';
 
 // Madrasa
 import MadrasaDashboard from './pages/dashboard/madrasa/MadrasaDashboard';
+import MadrasasPage from './pages/dashboard/madrasa/MadrasasPage';
+import MadrasaDetailPage from './pages/dashboard/madrasa/MadrasaDetailPage';
 import StudentsPage from './pages/dashboard/madrasa/StudentsPage';
 import TeachersPage from './pages/dashboard/madrasa/TeachersPage';
-import ClassesPage from './pages/dashboard/madrasa/ClassesPage';
-import AttendancePage from './pages/dashboard/madrasa/AttendancePage';
-import ExamsPage from './pages/dashboard/madrasa/ExamsPage';
+import MadrasaClassesPage from './pages/dashboard/madrasa/MadrasaClassesPage';
+import MadrasaTimetablePage from './pages/dashboard/madrasa/MadrasaTimetablePage';
+import MadrasaResultsPage from './pages/dashboard/madrasa/MadrasaResultsPage';
+import MadrasaFeesPage from './pages/dashboard/madrasa/MadrasaFeesPage';
+import MadrasaAnnouncementsPage from './pages/dashboard/madrasa/MadrasaAnnouncementsPage';
+import MadrasaParentPortalPage from './pages/dashboard/member/MadrasaParentPortalPage';
 
 // Mosque
 import MosqueDashboard from './pages/dashboard/mosque/MosqueDashboard';
@@ -103,6 +109,7 @@ function App() {
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
           {/* Dashboard App */}
           <Route path="/app" element={<DashboardLayout />}>
@@ -120,6 +127,7 @@ function App() {
             {/* Member */}
             <Route path="my-family" element={<MyFamilyPage />} />
             <Route path="my-payments" element={<PaymentsPage />} />
+            <Route path="my-madrasa" element={<MadrasaParentPortalPage />} />
 
             {/* Shared Core Modules */}
             <Route path="members" element={<MembersPage />} />
@@ -150,11 +158,15 @@ function App() {
 
             {/* Madrasa Sub-routes */}
             <Route path="madrasa" element={<MadrasaDashboard />} />
+            <Route path="madrasa/directory" element={<MadrasasPage />} />
+            <Route path="madrasa/:id" element={<MadrasaDetailPage />} />
+            <Route path="madrasa/classes" element={<MadrasaClassesPage />} />
             <Route path="madrasa/students" element={<StudentsPage />} />
             <Route path="madrasa/teachers" element={<TeachersPage />} />
-            <Route path="madrasa/classes" element={<ClassesPage />} />
-            <Route path="madrasa/attendance" element={<AttendancePage />} />
-            <Route path="madrasa/exams" element={<ExamsPage />} />
+            <Route path="madrasa/timetables" element={<MadrasaTimetablePage />} />
+            <Route path="madrasa/results" element={<MadrasaResultsPage />} />
+            <Route path="madrasa/fees" element={<MadrasaFeesPage />} />
+            <Route path="madrasa/announcements" element={<MadrasaAnnouncementsPage />} />
 
             {/* Mosque Sub-routes */}
             <Route path="mosque" element={<MosqueDashboard />} />

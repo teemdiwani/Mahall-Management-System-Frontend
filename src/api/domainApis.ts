@@ -133,22 +133,54 @@ export const marriageApi = {
 // ─── Madrasa ─────────────────────────────────────────────────────────────────
 export const madrasaApi = {
   getDashboard: async () => apiClient.get('/madrasa/dashboard'),
-  listClasses: async () => apiClient.get('/madrasa/classes'),
+  getParentPortal: async () => apiClient.get('/madrasa/parent-portal'),
+  listMadrasas: async () => apiClient.get('/madrasa/madrasas'),
+  getMadrasaDetails: async (id: string) => apiClient.get(`/madrasa/madrasas/${id}`),
+  createMadrasa: async (data: any) => apiClient.post('/madrasa/madrasas', data),
+  updateMadrasa: async (id: string, data: any) => apiClient.patch(`/madrasa/madrasas/${id}`, data),
+  deleteMadrasa: async (id: string) => apiClient.delete(`/madrasa/madrasas/${id}`),
+
+  // Classes (Standards 1 to 10 or 12)
+  listClasses: async (params?: Record<string, any>) => apiClient.get('/madrasa/classes', { params }),
   createClass: async (data: any) => apiClient.post('/madrasa/classes', data),
   updateClass: async (id: string, data: any) => apiClient.patch(`/madrasa/classes/${id}`, data),
   deleteClass: async (id: string) => apiClient.delete(`/madrasa/classes/${id}`),
+
+  // Timetables (Secretary uploads / manages class-wise)
+  listTimetables: async (params?: Record<string, any>) => apiClient.get('/madrasa/timetables', { params }),
+  getTimetableByClass: async (classId: string) => apiClient.get(`/madrasa/timetables/class/${classId}`),
+  saveTimetable: async (data: any) => apiClient.post('/madrasa/timetables', data),
+  deleteTimetable: async (id: string) => apiClient.delete(`/madrasa/timetables/${id}`),
+
+  // Exam Results (Entered by Madrasa Manager)
+  listResults: async (params?: Record<string, any>) => apiClient.get('/madrasa/results', { params }),
+  createResult: async (data: any) => apiClient.post('/madrasa/results', data),
+  updateResult: async (id: string, data: any) => apiClient.patch(`/madrasa/results/${id}`, data),
+  deleteResult: async (id: string) => apiClient.delete(`/madrasa/results/${id}`),
+
+  // Monthly Student Fees & Fee Alerts
+  listFees: async (params?: Record<string, any>) => apiClient.get('/madrasa/fees', { params }),
+  recordFeePayment: async (data: any) => apiClient.post('/madrasa/fees', data),
+  updateFeeStatus: async (id: string, data: any) => apiClient.patch(`/madrasa/fees/${id}`, data),
+
+  // Attendance
+  listAttendance: async (params?: Record<string, any>) => apiClient.get('/madrasa/attendance', { params }),
+  recordAttendance: async (data: any) => apiClient.post('/madrasa/attendance', data),
+
+  // Madrasa Announcements (Parent / Student Notices)
+  listAnnouncements: async (params?: Record<string, any>) => apiClient.get('/madrasa/announcements', { params }),
+  createAnnouncement: async (data: any) => apiClient.post('/madrasa/announcements', data),
+  deleteAnnouncement: async (id: string) => apiClient.delete(`/madrasa/announcements/${id}`),
+
+  // Students & Teachers (Census & Rosters)
   listStudents: async (params?: Record<string, any>) => apiClient.get('/madrasa/students', { params }),
   createStudent: async (data: any) => apiClient.post('/madrasa/students', data),
   updateStudent: async (id: string, data: any) => apiClient.patch(`/madrasa/students/${id}`, data),
-  listTeachers: async () => apiClient.get('/madrasa/teachers'),
+  deleteStudent: async (id: string) => apiClient.delete(`/madrasa/students/${id}`),
+  listTeachers: async (params?: Record<string, any>) => apiClient.get('/madrasa/teachers', { params }),
   createTeacher: async (data: any) => apiClient.post('/madrasa/teachers', data),
   updateTeacher: async (id: string, data: any) => apiClient.patch(`/madrasa/teachers/${id}`, data),
-  listAttendance: async (params?: Record<string, any>) => apiClient.get('/madrasa/attendance', { params }),
-  recordAttendance: async (data: any) => apiClient.post('/madrasa/attendance', data),
-  listExams: async () => apiClient.get('/madrasa/exams'),
-  createExam: async (data: any) => apiClient.post('/madrasa/exams', data),
-  recordResults: async (examId: string, results: any[]) => apiClient.post(`/madrasa/exams/${examId}/results`, { results }),
-  getResults: async (examId: string) => apiClient.get(`/madrasa/exams/${examId}/results`),
+  deleteTeacher: async (id: string) => apiClient.delete(`/madrasa/teachers/${id}`),
 };
 
 // ─── Volunteers ───────────────────────────────────────────────────────────────

@@ -1,18 +1,27 @@
 import React, { useState } from 'react';
 import { Users2, Calendar, CheckSquare, Plus, Loader2 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader, StatCard } from '../../../components/ui/EmptyState';
 import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
 import Avatar from '../../../components/ui/Avatar';
 import Modal from '../../../components/ui/Modal';
+import Input, { Textarea } from '../../../components/ui/Input';
 import Tabs, { useTabs } from '../../../components/ui/Tabs';
 import { committeeApi } from '../../../api/domainApis';
 
 const CommitteePage: React.FC = () => {
+  const qc = useQueryClient();
   const { activeTab, setActiveTab } = useTabs('members');
   const [selectedMeeting, setSelectedMeeting] = useState<any | null>(null);
+  const [isScheduleOpen, setIsScheduleOpen] = useState(false);
+  const [meetingForm, setMeetingForm] = useState({
+    title: '',
+    meetingDate: '',
+    location: 'Committee Boardroom',
+    agendaText: '',
+  });
 
   const { data: membersData, isLoading: loadingMembers } = useQuery({
     queryKey: ['committee-members'],
@@ -24,6 +33,35 @@ const CommitteePage: React.FC = () => {
     queryFn: committeeApi.getMeetings,
   });
 
+  const scheduleMutation = useMutation({
+    mutationFn: (data: any) => committeeApi.scheduleMeeting(data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['committee-meetings'] });
+      setIsScheduleOpen(false);
+      setMeetingForm({
+        title: '',
+        meetingDate: '',
+        location: 'Committee Boardroom',
+        agendaText: '',
+      });
+    },
+  });
+
+  const handleScheduleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const agenda = meetingForm.agendaText
+      .split('\n')
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+    scheduleMutation.mutate({
+      title: meetingForm.title,
+      meetingDate: meetingForm.meetingDate,
+      location: meetingForm.location,
+      agenda,
+    });
+  };
+
   const members: any[] = membersData?.data || [];
   const meetings: any[] = meetingsData?.data || [];
 
@@ -34,8 +72,8 @@ const CommitteePage: React.FC = () => {
       <PageHeader
         title="Committee"
         subtitle="Al-Noor Mahall Committee Administration — Synchronized with MongoDB"
-        breadcrumb={[{ label: 'Dashboard' }, { label: 'Committee' }]}
-        action={<Button icon={<Plus size={16} />}>Schedule Meeting</Button>}
+        breadcrumb={[{ label: 'Dashboard', href: '/app/dashboard' }, { label: 'Committee' }]}
+        action={<Button icon={<Plus size={16} />} onClick={() => setIsScheduleOpen(true)}>Schedule Meeting</Button>}
       />
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
@@ -213,6 +251,62 @@ const CommitteePage: React.FC = () => {
             )}
           </div>
         )}
+      </Modal>
+
+      {/* Schedule Meeting Modal */}
+      <Modal
+        isOpen={isScheduleOpen}
+        onClose={() => setIsScheduleOpen(false)}
+        title="Schedule Committee Meeting"
+        size="md"
+      >
+        <form onSubmit={handleScheduleSubmit} className="space-y-4">
+          <Input
+            label="Meeting Title / Subject"
+            placeholder="e.g. Monthly Executive Committee Review"
+            required
+            value={meetingForm.title}
+            onChange={(e) => setMeetingForm({ ...meetingForm, title: e.target.value })}
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              label="Meeting Date & Time"
+              type="datetime-local"
+              required
+              value={meetingForm.meetingDate}
+              onChange={(e) => setMeetingForm({ ...meetingForm, meetingDate: e.target.value })}
+            />
+            <Input
+              label="Meeting Location / Venue"
+              placeholder="e.g. Committee Boardroom"
+              required
+              value={meetingForm.location}
+              onChange={(e) => setMeetingForm({ ...meetingForm, location: e.target.value })}
+            />
+          </div>
+
+          <Textarea
+            label="Agenda Points (One per line)"
+            placeholder="Review monthly financial statements&#10;Approve welfare applications&#10;Madrasa annual festival planning"
+            required
+            value={meetingForm.agendaText}
+            onChange={(e) => setMeetingForm({ ...meetingForm, agendaText: e.target.value })}
+          />
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+            <Button variant="secondary" type="button" onClick={() => setIsScheduleOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              loading={scheduleMutation.isPending}
+              className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
+            >
+              Schedule &amp; Notify Members
+            </Button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

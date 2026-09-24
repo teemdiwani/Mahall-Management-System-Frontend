@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { MapPin, Users, Clock, Plus, Loader2 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '../../../components/ui/EmptyState';
@@ -6,6 +6,9 @@ import Card from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
 import Button from '../../../components/ui/Button';
 import Tabs, { useTabs } from '../../../components/ui/Tabs';
+import Modal from '../../../components/ui/Modal';
+import Input, { Textarea } from '../../../components/ui/Input';
+import Select from '../../../components/ui/Select';
 import { eventsApi } from '../../../api/domainApis';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -86,6 +89,17 @@ const EventsPage: React.FC = () => {
   const { activeTab, setActiveTab } = useTabs('all');
   const canManage = ['super_admin', 'SUPER_ADMIN', 'secretary', 'SECRETARY', 'committee_member', 'COMMITTEE_MEMBER'].includes(user?.role ?? '');
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    title: '',
+    category: 'COMMUNITY',
+    startDate: '',
+    endDate: '',
+    location: 'Mahall Community Center',
+    capacity: 200,
+    description: '',
+  });
+
   const { data, isLoading } = useQuery({
     queryKey: ['events', activeTab],
     queryFn: () => eventsApi.list({ status: activeTab !== 'all' ? activeTab : undefined }),
@@ -98,6 +112,31 @@ const EventsPage: React.FC = () => {
     },
   });
 
+  const createMutation = useMutation({
+    mutationFn: (payload: any) => eventsApi.create(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      setIsAddModalOpen(false);
+      setFormData({
+        title: '',
+        category: 'COMMUNITY',
+        startDate: '',
+        endDate: '',
+        location: 'Mahall Community Center',
+        capacity: 200,
+        description: '',
+      });
+    },
+  });
+
+  const handleCreateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMutation.mutate({
+      ...formData,
+      capacity: Number(formData.capacity) || 200,
+    });
+  };
+
   const events: any[] = data?.data || [];
 
   return (
@@ -107,7 +146,9 @@ const EventsPage: React.FC = () => {
         subtitle="Community events, programs and gatherings loaded live from MongoDB"
         breadcrumb={[{ label: 'Dashboard', href: '/app/dashboard' }, { label: 'Events' }]}
         action={canManage && (
-          <Button icon={<Plus size={16} />}>Add Event</Button>
+          <Button icon={<Plus size={16} />} onClick={() => setIsAddModalOpen(true)}>
+            Add Event
+          </Button>
         )}
       />
 
@@ -156,6 +197,88 @@ const EventsPage: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Add Event Modal */}
+      <Modal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        title="Add New Community Event"
+        size="md"
+      >
+        <form onSubmit={handleCreateSubmit} className="space-y-4">
+          <Input
+            label="Event Title"
+            placeholder="e.g. Ramadan Spiritual Workshop"
+            required
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Select
+              label="Category"
+              options={[
+                { value: 'RELIGIOUS', label: 'Religious' },
+                { value: 'COMMUNITY', label: 'Community' },
+                { value: 'EDUCATIONAL', label: 'Educational' },
+                { value: 'CHARITY', label: 'Charity & Welfare' },
+                { value: 'YOUTH', label: 'Youth & Sports' },
+              ]}
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            />
+            <Input
+              label="Max Capacity"
+              type="number"
+              min={1}
+              value={formData.capacity}
+              onChange={(e) => setFormData({ ...formData, capacity: Number(e.target.value) })}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Input
+              label="Start Date & Time"
+              type="datetime-local"
+              required
+              value={formData.startDate}
+              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
+            />
+            <Input
+              label="End Date & Time"
+              type="datetime-local"
+              required
+              value={formData.endDate}
+              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+            />
+          </div>
+
+          <Input
+            label="Location / Venue"
+            placeholder="e.g. Al-Noor Central Masjid Hall"
+            required
+            value={formData.location}
+            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          />
+
+          <Textarea
+            label="Event Description"
+            placeholder="Provide event schedule, guest speakers, eligibility..."
+            required
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          />
+
+          <div className="flex justify-end gap-3 pt-3 border-t border-gray-100">
+            <Button variant="secondary" type="button" onClick={() => setIsAddModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" loading={createMutation.isPending} className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
+              Publish Event
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };

@@ -213,19 +213,25 @@ const HajjUmrahPage: React.FC = () => {
     );
   });
 
-  const stats = statsRes?.data || {
-    totalPosts: rawPosts.length || 2,
-    openPosts: rawPosts.filter((p) => p.status === 'OPEN').length || 2,
-    totalSlots: rawPosts.reduce((acc, p) => acc + (p.totalSlots || 0), 0) || 40,
-    bookedSlots: rawPosts.reduce((acc, p) => acc + (p.bookedSlots || 0), 0) || 12,
-    availableSlots:
-      rawPosts.reduce((acc, p) => acc + Math.max(0, (p.totalSlots || 0) - (p.bookedSlots || 0)), 0) ||
-      28,
-    totalRegistrations: 12,
-  };
-
   const registrations: RegistrationItem[] = registrationsRes?.data || [];
   const myBookings: RegistrationItem[] = myBookingsRes?.data || [];
+
+  const computedSlots = rawPosts.reduce((acc, p) => acc + (Number(p.totalSlots) || 0), 0);
+  const computedBooked = rawPosts.reduce((acc, p) => acc + (Number(p.bookedSlots) || 0), 0);
+  const computedAvailable = rawPosts.reduce(
+    (acc, p) => acc + Math.max(0, (Number(p.totalSlots) || 0) - (Number(p.bookedSlots) || 0)),
+    0
+  );
+  const computedOpen = rawPosts.filter((p) => p.status === 'OPEN').length;
+
+  const stats = {
+    totalPosts: statsRes?.data?.totalPosts ?? rawPosts.length,
+    openPosts: statsRes?.data?.openPosts ?? computedOpen,
+    totalSlots: statsRes?.data?.totalSlots ?? computedSlots,
+    bookedSlots: statsRes?.data?.bookedSlots ?? computedBooked,
+    availableSlots: statsRes?.data?.availableSlots ?? computedAvailable,
+    totalRegistrations: statsRes?.data?.totalRegistrations ?? registrations.length,
+  };
 
   // Handlers
   const handleOpenRegister = (post: TravelPost) => {

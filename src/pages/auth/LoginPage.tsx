@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
@@ -19,11 +19,16 @@ const SEED_ACCOUNTS = [
 const LoginPage: React.FC = () => {
   const { login, googleLogin } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const location = useLocation();
+
+  const [email, setEmail] = useState((location.state as any)?.email || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(
+    (location.state as any)?.resetSuccess ? 'Password reset successfully! Please sign in with your new password.' : ''
+  );
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,9 +157,15 @@ const LoginPage: React.FC = () => {
 
           {/* Form */}
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
+            {success && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-800 text-sm">
+                <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                {success}
+              </div>
+            )}
             {error && (
               <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm">
-                <AlertCircle size={16} />
+                <AlertCircle size={16} className="shrink-0" />
                 {error}
               </div>
             )}
@@ -162,7 +173,10 @@ const LoginPage: React.FC = () => {
               label="Email address"
               type="email"
               value={email}
-              onChange={e => setEmail(e.target.value)}
+              onChange={e => {
+                setEmail(e.target.value);
+                if (success) setSuccess('');
+              }}
               placeholder="you@example.com"
               icon={<Mail size={16} />}
               required
@@ -183,7 +197,18 @@ const LoginPage: React.FC = () => {
                 required
               />
               <div className="flex justify-end mt-1">
-                <button type="button" className="text-xs text-emerald-600 hover:underline">Forgot password?</button>
+                <button
+                  type="button"
+                  onClick={() =>
+                    navigate(
+                      email.trim() ? `/forgot-password?email=${encodeURIComponent(email.trim())}` : '/forgot-password',
+                      { state: { email: email.trim() } }
+                    )
+                  }
+                  className="text-xs text-emerald-600 hover:text-emerald-700 hover:underline cursor-pointer font-medium"
+                >
+                  Forgot password?
+                </button>
               </div>
             </div>
             <Button type="submit" loading={loading} fullWidth size="lg" className="mt-2">

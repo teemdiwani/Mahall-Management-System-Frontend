@@ -19,6 +19,7 @@ const VolunteersPage: React.FC = () => {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [showRegister, setShowRegister] = useState(false);
   const [form, setForm] = useState({
     name: '', phone: '', bloodGroup: '', skills: '',
@@ -26,13 +27,23 @@ const VolunteersPage: React.FC = () => {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['volunteers', categoryFilter],
-    queryFn: () => volunteersApi.list({ category: categoryFilter || undefined }),
+    queryKey: ['volunteers', categoryFilter, statusFilter],
+    queryFn: () => volunteersApi.list({
+      category: categoryFilter || undefined,
+      status: statusFilter === 'ALL' ? undefined : statusFilter,
+    }),
   });
 
   const register = useMutation({
-    mutationFn: volunteersApi.register,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['volunteers'] }); setShowRegister(false); },
+    mutationFn: (newVol: any) => volunteersApi.register(newVol),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['volunteers'] });
+      setShowRegister(false);
+      setForm({
+        name: '', phone: '', bloodGroup: '', skills: '',
+        categories: [], availability: 'ANYTIME', emergencyVolunteer: false,
+      });
+    },
   });
 
   const toggleStatus = useMutation({
@@ -47,6 +58,7 @@ const VolunteersPage: React.FC = () => {
   );
 
   const active = volunteers.filter((v: any) => v.status === 'ACTIVE').length;
+  const inactive = volunteers.filter((v: any) => v.status === 'INACTIVE').length;
   const emergency = volunteers.filter((v: any) => v.emergencyVolunteer).length;
 
   const toggleCategory = (cat: string) => {
@@ -61,23 +73,30 @@ const VolunteersPage: React.FC = () => {
       <PageHeader
         title="Volunteer Management"
         subtitle="Emergency, event, welfare and blood donation volunteers"
-        breadcrumb={[{ label: 'Dashboard' }, { label: 'Volunteers' }]}
+        breadcrumb={[{ label: 'Dashboard', href: '/app/dashboard' }, { label: 'Volunteers' }]}
         action={<Button icon={<Plus size={16} />} onClick={() => setShowRegister(true)}>Register Volunteer</Button>}
       />
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard label="Total Volunteers" value={String(volunteers.length)} icon={<Users size={20} />} />
         <StatCard label="Active" value={String(active)} icon={<Heart size={20} />} iconBg="bg-emerald-50 text-emerald-600" />
-        <StatCard label="Emergency Response" value={String(emergency)} icon={<Shield size={20} />} iconBg="bg-red-50 text-red-600" />
+        <StatCard label="Inactive" value={String(inactive)} icon={<Users size={20} />} iconBg="bg-gray-100 text-gray-600" />
+        <StatCard label="Emergency Team" value={String(emergency)} icon={<Shield size={20} />} iconBg="bg-red-50 text-red-600" />
       </div>
 
       <Card padding="none">
         <div className="p-4 border-b border-gray-100 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search volunteers..."
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search volunteers by name or phone..."
               className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-400 outline-none" />
           </div>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+            className="text-sm rounded-xl border border-gray-200 px-3 py-2 bg-gray-50 focus:outline-none focus:border-emerald-400">
+            <option value="ALL">All Status</option>
+            <option value="ACTIVE">Active Only</option>
+            <option value="INACTIVE">Inactive Only</option>
+          </select>
           <select value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}
             className="text-sm rounded-xl border border-gray-200 px-3 py-2 bg-gray-50 focus:outline-none focus:border-emerald-400">
             <option value="">All Categories</option>
