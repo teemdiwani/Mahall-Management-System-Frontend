@@ -29,6 +29,8 @@ import UsersPage from './pages/dashboard/superadmin/UsersPage';
 
 // Member
 import MyFamilyPage from './pages/dashboard/member/MyFamilyPage';
+import MyPaymentsPage from './pages/dashboard/member/MyPaymentsPage';
+import OfficialInvoicePage from './pages/dashboard/payments/OfficialInvoicePage';
 
 // Treasurer & Finance
 import TreasurerDashboard from './pages/dashboard/treasurer/TreasurerDashboard';
@@ -111,6 +113,10 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
+          {/* Standalone Official Invoice (Non-sidebar, non-header page for print & download) */}
+          <Route path="/app/payments/:id/invoice" element={<OfficialInvoicePage />} />
+          <Route path="/payments/:id/invoice" element={<OfficialInvoicePage />} />
+
           {/* Dashboard App */}
           <Route path="/app" element={<DashboardLayout />}>
             <Route index element={<Navigate to="/app/dashboard" replace />} />
@@ -126,7 +132,7 @@ function App() {
 
             {/* Member */}
             <Route path="my-family" element={<MyFamilyPage />} />
-            <Route path="my-payments" element={<PaymentsPage />} />
+            <Route path="my-payments" element={<MyPaymentsPage />} />
             <Route path="my-madrasa" element={<MadrasaParentPortalPage />} />
 
             {/* Shared Core Modules */}

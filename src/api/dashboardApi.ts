@@ -13,8 +13,12 @@ export const dashboardApi = {
     return apiClient.get('/dashboard/charts');
   },
 
-  getMemberDashboard: async (): Promise<{ data: any }> => {
-    return apiClient.get('/dashboard/member');
+  getMemberDashboard: async (number?: string): Promise<{ data: any }> => {
+    return apiClient.get('/dashboard/member', { params: number ? { number } : undefined });
+  },
+
+  linkFamilyByPhone: async (phone: string): Promise<{ data: any }> => {
+    return apiClient.post('/dashboard/member/link-family', { phone });
   },
 
   getTreasurerDashboard: async (): Promise<{ data: any }> => {

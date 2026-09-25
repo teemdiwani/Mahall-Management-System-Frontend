@@ -1,22 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { Home, DollarSign, FileText, Calendar, Bell, Heart, Plane, Moon, Loader2 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  Home,
+  DollarSign,
+  FileText,
+  Calendar,
+  Bell,
+  Heart,
+  Plane,
+  Moon,
+  Loader2,
+  Users,
+  Phone,
+  ArrowRight,
+  Search,
+  CheckCircle2,
+  ShieldCheck,
+} from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import Card from '../../../components/ui/Card';
-import { PaymentStatusBadge, ApplicationStatusBadge } from '../../../components/ui/Badge';
+import Badge, { PaymentStatusBadge, ApplicationStatusBadge } from '../../../components/ui/Badge';
+import Avatar from '../../../components/ui/Avatar';
 import { StatCard } from '../../../components/ui/EmptyState';
 import { dashboardApi } from '../../../api/dashboardApi';
 import MadrasaParentPortalSection from '../../../components/madrasa/MadrasaParentPortalSection';
 
+const getRelationshipBadgeVariant = (rel: string): 'emerald' | 'blue' | 'teal' | 'purple' | 'gray' => {
+  const upper = (rel || '').toUpperCase();
+  if (upper === 'HEAD') return 'emerald';
+  if (upper === 'SPOUSE') return 'blue';
+  if (['SON', 'DAUGHTER', 'CHILD'].includes(upper)) return 'teal';
+  if (['FATHER', 'MOTHER', 'GRANDFATHER', 'GRANDMOTHER'].includes(upper)) return 'purple';
+  return 'gray';
+};
+
 const MemberDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, refreshMe } = useAuth();
+  const queryClient = useQueryClient();
+
+  const [searchPhoneInput, setSearchPhoneInput] = useState('');
+  const [isLinkingFamily, setIsLinkingFamily] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
+  const [linkSuccess, setLinkSuccess] = useState<string | null>(null);
+
   const { data, isLoading } = useQuery({
     queryKey: ['member-dashboard'],
-    queryFn: dashboardApi.getMemberDashboard,
+    queryFn: () => dashboardApi.getMemberDashboard(),
   });
 
   const d = data?.data;
+
+  const handleLinkFamily = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchPhoneInput.trim()) return;
+
+    setLinkError(null);
+    setLinkSuccess(null);
+    setIsLinkingFamily(true);
+
+    try {
+      const res = await dashboardApi.linkFamilyByPhone(searchPhoneInput.trim());
+      setLinkSuccess(res?.data?.message || 'Family household connected successfully!');
+      setSearchPhoneInput('');
+      await queryClient.invalidateQueries({ queryKey: ['member-dashboard'] });
+      await queryClient.invalidateQueries({ queryKey: ['my-family'] });
+      await refreshMe();
+      setTimeout(() => setLinkSuccess(null), 5000);
+    } catch (err: any) {
+      setLinkError(
+        err?.response?.data?.message || err?.message || 'No family found matching this phone number.'
+      );
+    } finally {
+      setIsLinkingFamily(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -29,8 +87,9 @@ const MemberDashboard: React.FC = () => {
     );
   }
 
+  const familyMembers: any[] = d?.familyMembers || [];
   const familyName = d?.family?.name || 'My Family';
-  const familyCount = d?.familyMembersCount || 1;
+  const familyCount = familyMembers.length || d?.familyMembersCount || 1;
   const duesStatus = d?.currentMonthDuesStatus || 'PENDING';
   const recentPayments = d?.recentPayments || [];
   const recentApplications = d?.recentApplications || [];
@@ -71,10 +130,10 @@ const MemberDashboard: React.FC = () => {
         />
         <StatCard
           label="Monthly Dues"
-          value="₹250"
+          value={`₹${d?.duesAmount || 250}`}
           icon={<DollarSign size={20} />}
           iconBg={duesStatus === 'PAID' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}
-          subtitle={duesStatus === 'PAID' ? 'September Cleared' : 'Payment Due'}
+          subtitle={duesStatus === 'PAID' ? 'Cleared' : '28th Automated Due'}
         />
         <StatCard
           label="Mahall Requests"
@@ -90,6 +149,166 @@ const MemberDashboard: React.FC = () => {
           iconBg="bg-teal-50 text-teal-600"
           subtitle="Community calendar"
         />
+      </div>
+
+      {/* Family Household & Members Section */}
+      <div className="mb-6">
+        {d?.family ? (
+          <Card padding="md" className="border-emerald-100/80 shadow-sm overflow-hidden relative">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 mb-4 border-b border-gray-100 gap-3">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="p-1.5 rounded-lg bg-emerald-100/60 text-emerald-700">
+                    <Home size={18} />
+                  </span>
+                  <h3 className="text-base font-bold text-gray-900">{familyName}</h3>
+                  <Badge variant="emerald" size="sm">
+                    {d.family.familyCode || 'Active Household'}
+                  </Badge>
+                  <Badge variant="teal" size="sm" dot>
+                    {d.family.status || 'ACTIVE'}
+                  </Badge>
+                </div>
+                <p className="text-xs text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
+                  <span>{d.family.area || d.family.ward || 'Mahall Ward'}</span>
+                  <span>·</span>
+                  <span>{d.family.address}</span>
+                  {d.family.phone && (
+                    <>
+                      <span>·</span>
+                      <span className="font-mono text-emerald-700 font-medium flex items-center gap-1">
+                        <Phone size={11} /> {d.family.phone}
+                      </span>
+                    </>
+                  )}
+                  {d.familyHead?.name && (
+                    <>
+                      <span>·</span>
+                      <span className="text-gray-600 flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-emerald-600" /> Head: {d.familyHead.name}
+                      </span>
+                    </>
+                  )}
+                </p>
+              </div>
+
+              <Link
+                to="/app/my-family"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl transition-colors self-start sm:self-auto flex-shrink-0"
+              >
+                <span>Manage Family Portal</span>
+                <ArrowRight size={14} />
+              </Link>
+            </div>
+
+            {/* All Members List */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Users size={14} className="text-emerald-600" />
+                  <span>Household Members ({familyMembers.length || familyCount})</span>
+                </h4>
+                <span className="text-[11px] text-gray-400">All registered census members</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                {(familyMembers.length > 0
+                  ? familyMembers
+                  : [
+                      {
+                        _id: 'default',
+                        name: user?.name || 'Head of Family',
+                        relationship: 'HEAD',
+                        phone: user?.phone || d.family.phone || '',
+                      },
+                    ]
+                ).map((m: any) => (
+                  <div
+                    key={m._id || m.id}
+                    className="flex items-center justify-between p-3 rounded-xl bg-gray-50/70 border border-gray-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all"
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <Avatar name={m.name || 'Member'} size="sm" />
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-gray-900 truncate">{m.name}</p>
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <Badge variant={getRelationshipBadgeVariant(m.relationship)} size="sm">
+                            {m.relationship}
+                          </Badge>
+                          {m.memberCode && (
+                            <span className="text-[10px] text-gray-400 font-mono hidden sm:inline">
+                              {m.memberCode}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right flex-shrink-0 pl-2">
+                      {m.phone ? (
+                        <div className="flex items-center justify-end gap-1 text-[11px] font-mono text-emerald-800 font-semibold bg-emerald-50/80 px-2 py-0.5 rounded-md border border-emerald-100">
+                          <Phone size={10} className="text-emerald-600" />
+                          <span>{m.phone}</span>
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-gray-400 italic">No phone</span>
+                      )}
+                      {m.occupation && (
+                        <p className="text-[10px] text-gray-500 mt-0.5 truncate max-w-[90px] text-right">
+                          {m.occupation}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        ) : (
+          <Card padding="md" className="border-amber-200 bg-amber-50/40 shadow-sm">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Home size={20} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-gray-900">Connect Your Family Household</h3>
+                  <p className="text-xs text-gray-600 mt-0.5 max-w-lg">
+                    Enter any family member's registered phone number (Head, Spouse, Son, Daughter) to automatically
+                    match and display your complete household details and census records.
+                  </p>
+                </div>
+              </div>
+
+              <form onSubmit={handleLinkFamily} className="flex items-center gap-2 w-full sm:w-auto">
+                <div className="relative flex-1 sm:w-48">
+                  <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchPhoneInput}
+                    onChange={(e) => setSearchPhoneInput(e.target.value)}
+                    placeholder="e.g. 9847111050"
+                    className="w-full pl-8 pr-3 py-1.5 text-xs rounded-xl border border-gray-200 focus:border-emerald-500 outline-none bg-white font-mono"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLinkingFamily || !searchPhoneInput.trim()}
+                  className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1.5 flex-shrink-0 shadow-sm"
+                >
+                  {isLinkingFamily ? <Loader2 size={12} className="animate-spin" /> : <Search size={12} />}
+                  <span>Connect</span>
+                </button>
+              </form>
+            </div>
+            {linkError && <p className="text-xs text-red-600 mt-2 pl-1 font-medium">{linkError}</p>}
+            {linkSuccess && (
+              <p className="text-xs text-emerald-700 font-semibold mt-2 pl-1 flex items-center gap-1">
+                <CheckCircle2 size={14} /> {linkSuccess}
+              </p>
+            )}
+          </Card>
+        )}
       </div>
 
       {/* Madrasa Parent Portal Section (Dynamically displayed ONLY when member's children study in Mahallu Madrasa) */}
@@ -111,26 +330,41 @@ const MemberDashboard: React.FC = () => {
                 <p className="text-sm text-gray-400 py-4 text-center">No payment history found.</p>
               ) : (
                 recentPayments.slice(0, 5).map((p: any) => (
-                  <div key={p._id} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0">
-                    <div>
-                      <p className="text-sm font-medium text-gray-800 capitalize">{p.type} Contribution</p>
-                      <p className="text-xs text-gray-400">{p.month || 'Direct'} · {p.receiptNumber || 'Pending Verification'}</p>
+                  <div key={p._id} className="flex items-center justify-between py-2.5 border-b border-gray-50 last:border-0 gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-800 capitalize truncate">{p.type} Contribution</p>
+                      <p className="text-xs text-gray-400 truncate">{p.month || 'Direct'} · {p.receiptNumber || 'Ref: ' + (p.paymentNumber || p._id?.slice(-8))}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-bold text-gray-800">₹{p.amount}</span>
+                    <div className="flex items-center gap-2.5 flex-shrink-0">
+                      <span className="text-sm font-bold text-gray-800 font-mono">₹{p.amount}</span>
                       <PaymentStatusBadge status={p.status.toLowerCase() as any} />
+                      {p.status === 'PAID' ? (
+                        <Link
+                          to={`/app/payments/${p._id}/invoice`}
+                          className="text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg transition-colors border border-emerald-200"
+                        >
+                          Invoice
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/app/my-payments"
+                          className="text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 px-2.5 py-1 rounded-lg transition-colors shadow-sm"
+                        >
+                          Pay
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))
               )}
             </div>
             {duesStatus === 'PENDING' && (
-              <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-center justify-between">
+              <div className="mt-3 p-3 bg-amber-50 rounded-xl border border-amber-100 flex items-center justify-between flex-wrap gap-2">
                 <p className="text-sm text-amber-700">
-                  Your monthly contribution of <strong>₹250</strong> for this month is currently pending.
+                  Your monthly contribution of <strong>₹{d?.duesAmount || 250}</strong> for this month is currently pending.
                 </p>
-                <Link to="/app/my-payments" className="text-xs font-semibold bg-amber-600 text-white px-3 py-1.5 rounded-lg hover:bg-amber-700 transition-colors">
-                  Pay Now
+                <Link to="/app/my-payments" className="text-xs font-bold bg-amber-600 text-white px-3.5 py-1.5 rounded-lg hover:bg-amber-700 transition-colors shadow-sm">
+                  Pay with Razorpay
                 </Link>
               </div>
             )}

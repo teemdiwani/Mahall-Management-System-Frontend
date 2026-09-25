@@ -24,12 +24,12 @@ const FinanceReportsPage: React.FC = () => {
     queryFn: () => financeApi.listExpenses({ limit: 100 }),
   });
 
-  const { data: dashData } = useQuery({
+  const { data: dashData, isLoading: loadingDash } = useQuery({
     queryKey: ['treasurer-dashboard'],
     queryFn: dashboardApi.getTreasurerDashboard,
   });
 
-  if (isLoading) {
+  if (isLoading || loadingDash) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3 text-gray-500">

@@ -7,7 +7,13 @@ export const familiesApi = {
   create: async (data: any) => apiClient.post('/families', data),
   update: async (id: string, data: any) => apiClient.patch(`/families/${id}`, data),
   archive: async (id: string, force?: boolean) => apiClient.delete(`/families/${id}`, { params: { force } }),
-  getMyFamily: async () => apiClient.get('/families/my-family'),
+  getMyFamily: async (params?: { phone?: string; number?: string }) => {
+    const queryParams =
+      params && typeof params === 'object' && (params.phone || params.number)
+        ? { phone: params.phone, number: params.number }
+        : undefined;
+    return apiClient.get('/families/my-family', { params: queryParams });
+  },
   getMembers: async (id: string) => apiClient.get(`/families/${id}/members`),
   addMember: async (id: string, data: any) => apiClient.post(`/families/${id}/members`, data),
   updateMember: async (familyId: string, memberId: string, data: any) =>
@@ -36,8 +42,22 @@ export const familyRequestsApi = {
 export const paymentsApi = {
   list: async (params?: Record<string, any>) => apiClient.get('/payments', { params }),
   create: async (data: any) => apiClient.post('/payments', data),
-  verify: async (id: string) => apiClient.patch(`/payments/${id}/verify`),
+  verify: async (id: string, data?: any) => apiClient.patch(`/payments/${id}/verify`, data),
   getMyPayments: async () => apiClient.get('/payments/my-payments'),
+  createRazorpayOrder: async (paymentId: string) => apiClient.post(`/payments/${paymentId}/razorpay-order`),
+  contributeOnline: async (data: {
+    amount: number;
+    type: 'ZAKAT' | 'FITRAH' | 'IFTAR' | 'DONATION' | 'MONTHLY' | 'EVENT' | 'OTHER';
+    donorName?: string;
+    phone?: string;
+    notes?: string;
+  }) => apiClient.post('/payments/contribute-online', data),
+  verifyRazorpay: async (
+    paymentId: string,
+    data: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }
+  ) => apiClient.post(`/payments/${paymentId}/verify-razorpay`, data),
+  getInvoice: async (paymentId: string) => apiClient.get(`/payments/${paymentId}/invoice`),
+  trigger28thDues: async () => apiClient.post('/payments/trigger-28th-dues'),
 };
 
 export const financeApi = {
@@ -82,6 +102,8 @@ export const eventsApi = {
 
 export const committeeApi = {
   getMembers: async (): Promise<{ data: any[] }> => apiClient.get('/committee/members'),
+  createMember: async (data: any): Promise<{ data: any }> => apiClient.post('/committee/members', data),
+  deleteMember: async (id: string): Promise<{ data: any }> => apiClient.delete(`/committee/members/${id}`),
   getMeetings: async (): Promise<{ data: any[] }> => apiClient.get('/committee/meetings'),
   scheduleMeeting: async (data: any): Promise<{ data: any }> => apiClient.post('/committee/meetings', data),
   updateMinutes: async (id: string, data: any): Promise<{ data: any }> => apiClient.patch(`/committee/meetings/${id}/minutes`, data),
@@ -162,6 +184,12 @@ export const madrasaApi = {
   listFees: async (params?: Record<string, any>) => apiClient.get('/madrasa/fees', { params }),
   recordFeePayment: async (data: any) => apiClient.post('/madrasa/fees', data),
   updateFeeStatus: async (id: string, data: any) => apiClient.patch(`/madrasa/fees/${id}`, data),
+  createRazorpayOrder: async (feeId: string) => apiClient.post(`/madrasa/fees/${feeId}/razorpay-order`),
+  verifyRazorpay: async (
+    feeId: string,
+    data: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }
+  ) => apiClient.post(`/madrasa/fees/${feeId}/verify-razorpay`, data),
+  getFeeInvoice: async (feeId: string) => apiClient.get(`/madrasa/fees/${feeId}/invoice`),
 
   // Attendance
   listAttendance: async (params?: Record<string, any>) => apiClient.get('/madrasa/attendance', { params }),

@@ -161,7 +161,7 @@ const MadrasaAnnouncementsPage: React.FC = () => {
                   <span className="px-2 py-0.5 rounded-md text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-800 border border-emerald-100">
                     {a.category}
                   </span>
-                  <Badge variant={a.priority === 'HIGH' || a.priority === 'URGENT' ? 'rose' : 'gray'} size="sm">
+                  <Badge variant={a.priority === 'HIGH' || a.priority === 'URGENT' ? 'red' : 'gray'} size="sm">
                     {a.priority}
                   </Badge>
                 </div>

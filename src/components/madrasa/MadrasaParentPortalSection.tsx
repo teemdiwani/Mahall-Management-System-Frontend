@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   BookOpen, Calendar, Award, DollarSign, Clock, CheckCircle2,
   AlertTriangle, Bell, User, ChevronRight, FileText,
-  Sparkles, Check, Download, AlertCircle, Phone, MapPin
+  Sparkles, Check, Download, AlertCircle, Phone, MapPin,
+  CreditCard, Loader2
 } from 'lucide-react';
 import Card, { CardHeader, CardTitle } from '../ui/Card';
 import Badge from '../ui/Badge';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
-import Modal from '../ui/Modal';
 import { madrasaApi } from '../../api/domainApis';
+import { loadRazorpayScript } from '../../utils/loadRazorpay';
 
 interface Props {
   isStandalone?: boolean;
@@ -18,34 +20,98 @@ interface Props {
 
 export const MadrasaParentPortalSection: React.FC<Props> = ({ isStandalone = false }) => {
   const qc = useQueryClient();
+  const navigate = useNavigate();
   const [selectedStudentIndex, setSelectedStudentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'timetable' | 'results' | 'fees' | 'attendance'>('timetable');
   const [selectedDay, setSelectedDay] = useState<string>('Monday');
-  const [payingFee, setPayingFee] = useState<any>(null);
-  const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [processingFeeId, setProcessingFeeId] = useState<string | null>(null);
+  const [feeError, setFeeError] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ['madrasa-parent-portal'],
     queryFn: madrasaApi.getParentPortal,
   });
 
-  const payFeeMutation = useMutation({
-    mutationFn: (feeId: string) =>
-      madrasaApi.updateFeeStatus(feeId, {
-        status: 'PAID',
-        paymentMethod: 'UPI',
-        receiptNumber: `MDR-ONL-${Date.now().toString().slice(-6)}`,
-      }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['madrasa-parent-portal'] });
-      qc.invalidateQueries({ queryKey: ['member-dashboard'] });
-      setPaymentSuccess(true);
-      setTimeout(() => {
-        setPayingFee(null);
-        setPaymentSuccess(false);
-      }, 1500);
-    },
-  });
+  const handlePayFeeWithRazorpay = async (fee: any) => {
+    setFeeError(null);
+    setProcessingFeeId(fee._id);
+
+    try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error('Could not load Razorpay payment gateway. Please check your connection.');
+      }
+
+      const orderRes = await madrasaApi.createRazorpayOrder(fee._id);
+      const orderData = orderRes.data;
+
+      const currentStudent = students[selectedStudentIndex] || students[0];
+      const studentObj = currentStudent?.student;
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amountInPaise,
+        currency: orderData.currency || 'INR',
+        name: 'Al-Noor Madrasa Directorate',
+        description: `Madrasa Tuition Fee - ${orderData.studentName} (${fee.month})`,
+        image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=128&q=80',
+        order_id: orderData.orderId,
+        handler: async (response: any) => {
+          try {
+            setProcessingFeeId(fee._id);
+            const verifyRes = await madrasaApi.verifyRazorpay(fee._id, {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            });
+
+            await qc.invalidateQueries({ queryKey: ['madrasa-parent-portal'] });
+            await qc.invalidateQueries({ queryKey: ['member-dashboard'] });
+            await qc.invalidateQueries({ queryKey: ['my-payments'] });
+
+            const targetInvoiceId = verifyRes.data?.payment?._id || fee._id;
+            navigate(`/app/payments/${targetInvoiceId}/invoice`);
+          } catch (verifyErr: any) {
+            setFeeError(
+              verifyErr?.response?.data?.message ||
+                verifyErr?.message ||
+                'Payment verification failed. Please contact the Madrasa desk.'
+            );
+          } finally {
+            setProcessingFeeId(null);
+          }
+        },
+        prefill: {
+          name: studentObj?.guardianName || studentObj?.name || 'Parent',
+          contact: studentObj?.guardianPhone || '',
+        },
+        notes: {
+          feeId: fee._id,
+          month: fee.month,
+          studentName: orderData.studentName,
+        },
+        theme: {
+          color: '#059669',
+        },
+        modal: {
+          ondismiss: () => {
+            setProcessingFeeId(null);
+          },
+        },
+      };
+
+      const razorpayInstance = new (window as any).Razorpay(options);
+      razorpayInstance.on('payment.failed', (resp: any) => {
+        setFeeError(resp.error?.description || 'Payment was unsuccessful or cancelled.');
+        setProcessingFeeId(null);
+      });
+
+      razorpayInstance.open();
+    } catch (err: any) {
+      setFeeError(err?.response?.data?.message || err?.message || 'Could not initiate Razorpay checkout.');
+      setProcessingFeeId(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -214,15 +280,38 @@ export const MadrasaParentPortalSection: React.FC<Props> = ({ isStandalone = fal
 
           <div className="flex items-center gap-2 flex-shrink-0 self-end sm:self-center">
             {fees.find((f: any) => f.status === 'PENDING') && (
-              <Button
-                size="sm"
-                className="bg-amber-600 hover:bg-amber-700 text-white font-bold shadow-md"
-                onClick={() => setPayingFee(fees.find((f: any) => f.status === 'PENDING'))}
+              <button
+                disabled={processingFeeId === fees.find((f: any) => f.status === 'PENDING')?._id}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
+                onClick={() => handlePayFeeWithRazorpay(fees.find((f: any) => f.status === 'PENDING'))}
               >
-                Pay ₹{feeAlert.totalPending} Now
-              </Button>
+                {processingFeeId === fees.find((f: any) => f.status === 'PENDING')?._id ? (
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Opening Razorpay...</span>
+                  </>
+                ) : (
+                  <>
+                    <CreditCard size={14} />
+                    <span>Pay ₹{feeAlert.totalPending} with Razorpay</span>
+                  </>
+                )}
+              </button>
             )}
           </div>
+        </div>
+      )}
+
+      {/* Fee Action Error Banner */}
+      {feeError && (
+        <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle size={16} className="text-red-600 flex-shrink-0" />
+            <span>{feeError}</span>
+          </div>
+          <button onClick={() => setFeeError(null)} className="font-bold text-red-800 hover:underline">
+            Dismiss
+          </button>
         </div>
       )}
 
@@ -531,20 +620,39 @@ export const MadrasaParentPortalSection: React.FC<Props> = ({ isStandalone = fal
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm font-extrabold text-gray-900">₹{fee.amount}</span>
+                    <div className="flex items-center gap-2.5">
+                      <span className="text-sm font-extrabold text-gray-900 font-mono">₹{fee.amount}</span>
                       {isPaid ? (
-                        <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700">
-                          PAID
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700">
+                            PAID
+                          </span>
+                          <button
+                            onClick={() => navigate(`/app/payments/${fee.paymentId || fee._id}/invoice`)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all shadow-sm"
+                          >
+                            <Download size={13} className="text-emerald-700" />
+                            <span>Invoice</span>
+                          </button>
+                        </div>
                       ) : (
-                        <Button
-                          size="sm"
-                          className="bg-amber-600 hover:bg-amber-700 text-white font-bold"
-                          onClick={() => setPayingFee(fee)}
+                        <button
+                          disabled={processingFeeId === fee._id}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold text-xs shadow-md transition-all disabled:opacity-50"
+                          onClick={() => handlePayFeeWithRazorpay(fee)}
                         >
-                          Pay Now
-                        </Button>
+                          {processingFeeId === fee._id ? (
+                            <>
+                              <Loader2 size={13} className="animate-spin" />
+                              <span>Opening Razorpay...</span>
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard size={14} />
+                              <span>Pay with Razorpay</span>
+                            </>
+                          )}
+                        </button>
                       )}
                     </div>
                   </div>
@@ -676,75 +784,7 @@ export const MadrasaParentPortalSection: React.FC<Props> = ({ isStandalone = fal
         )}
       </Card>
 
-      {/* ─── Instant Fee Payment Modal ─────────────────────────────────────── */}
-      <Modal
-        isOpen={!!payingFee}
-        onClose={() => setPayingFee(null)}
-        title="Pay Madrasa Monthly Fee"
-      >
-        {payingFee && (
-          <div className="space-y-4 text-sm">
-            {paymentSuccess ? (
-              <div className="py-8 text-center space-y-2">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
-                  <Check size={28} />
-                </div>
-                <h4 className="text-lg font-bold text-gray-900">Payment Completed!</h4>
-                <p className="text-xs text-gray-500">
-                  Fee receipt has been generated and sent to your registered contact.
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-emerald-800 font-medium">Student:</span>
-                    <span className="font-bold text-gray-900">{student.name}</span>
-                  </div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-emerald-800 font-medium">Class / Div:</span>
-                    <span className="font-bold text-gray-900">Class {student.standard}-{student.division}</span>
-                  </div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-emerald-800 font-medium">Month:</span>
-                    <span className="font-bold text-gray-900">{payingFee.month}</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2 mt-2 border-t border-emerald-200/60">
-                    <span className="text-xs text-emerald-900 font-bold uppercase">Total Payable:</span>
-                    <span className="text-xl font-black text-emerald-800">₹{payingFee.amount}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs font-bold text-gray-700 mb-2">Select Payment Method:</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <button className="p-3 rounded-xl border-2 border-emerald-600 bg-emerald-50/50 text-emerald-800 font-bold flex items-center justify-center gap-2">
-                      <span>⚡ UPI / QR Scan</span>
-                    </button>
-                    <button className="p-3 rounded-xl border border-gray-200 hover:bg-gray-50 text-gray-700 font-medium flex items-center justify-center gap-2">
-                      <span>🏦 Net Banking</span>
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" className="flex-1" onClick={() => setPayingFee(null)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold"
-                    onClick={() => payFeeMutation.mutate(payingFee._id)}
-                    disabled={payFeeMutation.isPending}
-                  >
-                    {payFeeMutation.isPending ? 'Processing...' : `Confirm Pay ₹${payingFee.amount}`}
-                  </Button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </Modal>
-    </div>
+      </div>
   );
 };
 

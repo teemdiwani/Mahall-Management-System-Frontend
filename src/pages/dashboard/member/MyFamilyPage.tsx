@@ -12,6 +12,7 @@ import {
   UserPlus,
   UserMinus,
   Edit3,
+  Search,
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '../../../components/ui/EmptyState';
@@ -21,30 +22,35 @@ import Button from '../../../components/ui/Button';
 import Avatar from '../../../components/ui/Avatar';
 import Modal from '../../../components/ui/Modal';
 import { familiesApi, familyRequestsApi } from '../../../api/domainApis';
+import { dashboardApi } from '../../../api/dashboardApi';
 
 // Simple visual tree node
-const FamilyTreeNode: React.FC<{ name: string; role: string; isHead?: boolean }> = ({
-  name,
-  role,
+const FamilyTreeNode: React.FC<{ name?: string; role?: string; isHead?: boolean }> = ({
+  name = 'Member',
+  role = 'Member',
   isHead,
-}) => (
-  <div
-    className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all ${
-      isHead ? 'border-emerald-400 bg-emerald-50 shadow-sm' : 'border-gray-200 bg-white'
-    } min-w-[110px]`}
-  >
-    <Avatar name={name} size="md" />
-    <div className="text-center">
-      <p className="text-xs font-bold text-gray-800 leading-tight">{name.split(' ')[0]}</p>
-      <p className="text-[10px] text-gray-500 font-medium capitalize mt-0.5">{role.toLowerCase()}</p>
+}) => {
+  const safeName = name || 'Member';
+  const safeRole = role || 'Member';
+  return (
+    <div
+      className={`flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all ${
+        isHead ? 'border-emerald-400 bg-emerald-50 shadow-sm' : 'border-gray-200 bg-white'
+      } min-w-[110px]`}
+    >
+      <Avatar name={safeName} size="md" />
+      <div className="text-center">
+        <p className="text-xs font-bold text-gray-800 leading-tight">{safeName.split(' ')[0]}</p>
+        <p className="text-[10px] text-gray-500 font-medium capitalize mt-0.5">{safeRole.toLowerCase()}</p>
+      </div>
+      {isHead && (
+        <Badge variant="emerald" size="sm">
+          Head
+        </Badge>
+      )}
     </div>
-    {isHead && (
-      <Badge variant="emerald" size="sm">
-        Head
-      </Badge>
-    )}
-  </div>
-);
+  );
+};
 
 const RELATIONSHIPS = [
   'SPOUSE',
@@ -91,10 +97,15 @@ const MyFamilyPage: React.FC = () => {
     email: '',
   });
 
+  // Phone linking state (MUST be at top level before any conditional returns)
+  const [linkPhoneInput, setLinkPhoneInput] = useState('');
+  const [isLinking, setIsLinking] = useState(false);
+  const [linkInputError, setLinkInputError] = useState<string | null>(null);
+
   // ── Queries ──
   const { data, isLoading } = useQuery({
     queryKey: ['my-family'],
-    queryFn: familiesApi.getMyFamily,
+    queryFn: () => familiesApi.getMyFamily(),
   });
 
   const result = data?.data;
@@ -231,37 +242,94 @@ const MyFamilyPage: React.FC = () => {
     );
   }
 
+  const handleLinkByPhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkPhoneInput.trim()) return;
+    setLinkInputError(null);
+    setIsLinking(true);
+    try {
+      await dashboardApi.linkFamilyByPhone(linkPhoneInput.trim());
+      await queryClient.invalidateQueries({ queryKey: ['my-family'] });
+      await queryClient.invalidateQueries({ queryKey: ['member-dashboard'] });
+      setLinkPhoneInput('');
+    } catch (err: any) {
+      setLinkInputError(
+        err?.response?.data?.message || err?.message || 'No family found with this phone number.'
+      );
+    } finally {
+      setIsLinking(false);
+    }
+  };
+
   if (!family) {
     return (
       <div>
         <PageHeader title="My Family" breadcrumb={[{ label: 'Dashboard' }, { label: 'My Family' }]} />
-        <div className="text-center py-20 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-          <Home size={48} className="text-gray-300 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-gray-800">No Family Assigned</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Your profile has not yet been linked to a registered Mahall household.
+        <div className="py-12 px-6 max-w-xl mx-auto text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200 shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+            <Home size={32} />
+          </div>
+          <h3 className="text-lg font-bold text-gray-800">No Family Assigned Yet</h3>
+          <p className="text-sm text-gray-500 mt-1 max-w-md mx-auto">
+            Your profile has not yet been linked to a registered Mahall household census record.
           </p>
-          <p className="text-xs text-gray-400 mt-1">
-            Please contact the Mahall Secretary office to register or link your family.
+
+          {/* Interactive Phone Linking Box */}
+          <div className="mt-6 p-4 rounded-2xl bg-white border border-gray-200 shadow-sm text-left">
+            <p className="text-xs font-bold text-gray-800 mb-1">Connect Your Household</p>
+            <p className="text-xs text-gray-500 mb-3">
+              Enter any family member's registered phone number (Head, Spouse, Son, Daughter) to automatically connect:
+            </p>
+            <form onSubmit={handleLinkByPhone} className="flex gap-2">
+              <div className="relative flex-1">
+                <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  value={linkPhoneInput}
+                  onChange={(e) => setLinkPhoneInput(e.target.value)}
+                  placeholder="e.g. 9847111050"
+                  className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-200 focus:border-emerald-500 outline-none font-mono"
+                />
+              </div>
+              <Button
+                type="submit"
+                variant="primary"
+                size="sm"
+                loading={isLinking}
+                disabled={!linkPhoneInput.trim()}
+                icon={<Search size={14} />}
+              >
+                Connect
+              </Button>
+            </form>
+            {linkInputError && (
+              <p className="text-xs text-red-600 mt-2 font-medium">{linkInputError}</p>
+            )}
+          </div>
+
+          <p className="text-xs text-gray-400 mt-4">
+            If you need assistance or are registering a new family, please contact the Mahall Secretary office.
           </p>
         </div>
       </div>
     );
   }
 
-  const parents = members.filter((m) =>
-    ['HEAD', 'SPOUSE', 'FATHER', 'MOTHER'].includes(m.relationship)
+  const parents = (members || []).filter((m) =>
+    ['HEAD', 'SPOUSE', 'FATHER', 'MOTHER'].includes((m?.relationship || '').toUpperCase())
   );
-  const children = members.filter((m) => ['SON', 'DAUGHTER'].includes(m.relationship));
-  const elders = members.filter((m) =>
-    ['GRANDFATHER', 'GRANDMOTHER'].includes(m.relationship)
+  const children = (members || []).filter((m) =>
+    ['SON', 'DAUGHTER'].includes((m?.relationship || '').toUpperCase())
+  );
+  const elders = (members || []).filter((m) =>
+    ['GRANDFATHER', 'GRANDMOTHER'].includes((m?.relationship || '').toUpperCase())
   );
 
   return (
     <div>
       <PageHeader
-        title={family.name}
-        subtitle={`${family.area || family.ward || 'Mahall'} · ${family.address} · Code: ${family.familyCode || '—'}`}
+        title={family?.name || 'My Family'}
+        subtitle={`${family?.area || family?.ward || 'Mahall'} · ${family?.address || ''} · Code: ${family?.familyCode || '—'}`}
         breadcrumb={[{ label: 'Dashboard' }, { label: 'My Family' }]}
         action={
           isFamilyHead ? (
@@ -274,7 +342,7 @@ const MyFamilyPage: React.FC = () => {
             </Button>
           ) : (
             <div className="px-3 py-1.5 rounded-xl bg-gray-100 text-xs font-semibold text-gray-600 border border-gray-200">
-              Role: {myRelationship} (Head: {family.familyHead?.name || 'Assigned'})
+              Role: {myRelationship} (Head: {family?.familyHead?.name || 'Assigned'})
             </div>
           )
         }
@@ -381,11 +449,11 @@ const MyFamilyPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Phone</p>
-                  <p className="text-sm font-semibold text-gray-800 font-mono">{family.phone}</p>
+                  <p className="text-sm font-semibold text-gray-800 font-mono">{family?.phone || '—'}</p>
                 </div>
               </div>
 
-              {family.email && (
+              {family?.email && (
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
                     <Mail size={15} className="text-blue-700" />
@@ -403,7 +471,7 @@ const MyFamilyPage: React.FC = () => {
                 </div>
                 <div>
                   <p className="text-xs text-gray-400">Address</p>
-                  <p className="text-sm font-medium text-gray-800">{family.address}</p>
+                  <p className="text-sm font-medium text-gray-800">{family?.address || '—'}</p>
                 </div>
               </div>
             </div>
@@ -415,7 +483,7 @@ const MyFamilyPage: React.FC = () => {
               <span className="flex items-center gap-2">
                 <Users size={16} className="text-emerald-700" /> All Members ({members.length})
               </span>
-              <span className="text-xs text-gray-400 font-mono">{family.familyCode}</span>
+              <span className="text-xs text-gray-400 font-mono">{family?.familyCode || '—'}</span>
             </h3>
             <div className="flex flex-col gap-2 max-h-72 overflow-y-auto pr-1">
               {members.map((m) => (
@@ -424,11 +492,11 @@ const MyFamilyPage: React.FC = () => {
                   className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
                 >
                   <div className="flex items-center gap-2.5">
-                    <Avatar name={m.name} size="xs" />
+                    <Avatar name={m.name || 'Member'} size="xs" />
                     <div>
-                      <p className="text-sm font-bold text-gray-800 leading-tight">{m.name}</p>
+                      <p className="text-sm font-bold text-gray-800 leading-tight">{m.name || 'Member'}</p>
                       <p className="text-[11px] text-gray-400 capitalize">
-                        {m.relationship?.toLowerCase()}
+                        {(m.relationship || 'MEMBER').toLowerCase()}
                       </p>
                     </div>
                   </div>
