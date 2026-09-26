@@ -11,7 +11,6 @@ import {
   KeyRound,
   ShieldCheck,
   RefreshCw,
-  Sparkles,
 } from 'lucide-react';
 import { authApi } from '../../api/authApi';
 import Button from '../../components/ui/Button';
@@ -30,7 +29,6 @@ const ForgotPasswordPage: React.FC = () => {
   const [step, setStep] = useState<Step>('EMAIL');
   const [email, setEmail] = useState(initialEmail);
   const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
-  const [devOtp, setDevOtp] = useState<string | null>(null);
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -81,11 +79,6 @@ const ForgotPasswordPage: React.FC = () => {
         res?.message ||
         'A 6-digit verification code has been sent to your email.';
       setSuccessMsg(msg);
-      if (res?.data?.devOtp || res?.devOtp) {
-        const foundOtp = res?.data?.devOtp || res?.devOtp;
-        setDevOtp(foundOtp);
-        handleAutoFillOtp(foundOtp);
-      }
       setStep('OTP');
       setResendCooldown(60);
     } catch (err: any) {
@@ -113,11 +106,6 @@ const ForgotPasswordPage: React.FC = () => {
         res?.message ||
         'A fresh 6-digit verification code has been sent.';
       setSuccessMsg(msg);
-      if (res?.data?.devOtp || res?.devOtp) {
-        const foundOtp = res?.data?.devOtp || res?.devOtp;
-        setDevOtp(foundOtp);
-        handleAutoFillOtp(foundOtp);
-      }
       setResendCooldown(60);
     } catch (err: any) {
       const msg =
@@ -407,24 +395,6 @@ const ForgotPasswordPage: React.FC = () => {
               )}
 
               <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
-                {devOtp && (
-                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
-                    <div className="flex items-center gap-2">
-                      <Sparkles size={15} className="text-emerald-600 shrink-0" />
-                      <span>
-                        Quick verification code: <strong className="font-mono text-sm tracking-wider text-emerald-950 ml-1">{devOtp}</strong>
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleAutoFillOtp(devOtp)}
-                      className="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 cursor-pointer transition-colors shadow-xs"
-                    >
-                      Auto-fill
-                    </button>
-                  </div>
-                )}
-
                 {/* 6 Modern Mini-Boxes */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 block mb-2 text-center">
