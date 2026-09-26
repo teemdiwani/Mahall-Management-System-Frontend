@@ -42,6 +42,7 @@ export const familyRequestsApi = {
 export const paymentsApi = {
   list: async (params?: Record<string, any>) => apiClient.get('/payments', { params }),
   create: async (data: any) => apiClient.post('/payments', data),
+  recordDirect: async (data: any) => apiClient.post('/payments/record', data),
   verify: async (id: string, data?: any) => apiClient.patch(`/payments/${id}/verify`, data),
   getMyPayments: async () => apiClient.get('/payments/my-payments'),
   createRazorpayOrder: async (paymentId: string) => apiClient.post(`/payments/${paymentId}/razorpay-order`),

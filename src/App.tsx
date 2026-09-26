@@ -30,6 +30,7 @@ import UsersPage from './pages/dashboard/superadmin/UsersPage';
 // Member
 import MyFamilyPage from './pages/dashboard/member/MyFamilyPage';
 import MyPaymentsPage from './pages/dashboard/member/MyPaymentsPage';
+import WelfareDonationPage from './pages/dashboard/member/WelfareDonationPage';
 import OfficialInvoicePage from './pages/dashboard/payments/OfficialInvoicePage';
 
 // Treasurer & Finance
@@ -133,6 +134,7 @@ function App() {
             {/* Member */}
             <Route path="my-family" element={<MyFamilyPage />} />
             <Route path="my-payments" element={<MyPaymentsPage />} />
+            <Route path="welfare-donation" element={<WelfareDonationPage />} />
             <Route path="my-madrasa" element={<MadrasaParentPortalPage />} />
 
             {/* Shared Core Modules */}

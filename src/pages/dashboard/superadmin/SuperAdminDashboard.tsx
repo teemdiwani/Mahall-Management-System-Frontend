@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
   Users, Home, Calendar, BookOpen, Heart, DollarSign,
-  TrendingUp, FileText, Star, Moon, Loader2
+  TrendingUp, FileText, Star, Moon, Loader2, UserPlus, Plus
 } from 'lucide-react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid, Legend,
@@ -11,11 +11,13 @@ import {
 import { StatCard, PageHeader } from '../../../components/ui/EmptyState';
 import Card, { CardHeader, CardTitle } from '../../../components/ui/Card';
 import Badge from '../../../components/ui/Badge';
+import Button from '../../../components/ui/Button';
 import { dashboardApi } from '../../../api/dashboardApi';
 
 const PIE_COLORS = ['#10b981', '#6366f1', '#f59e0b', '#ef4444', '#14b8a6', '#8b5cf6', '#f97316'];
 
 const SuperAdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const { data, isLoading } = useQuery({
     queryKey: ['admin-dashboard'],
     queryFn: dashboardApi.getAdminDashboard,
@@ -63,9 +65,24 @@ const SuperAdminDashboard: React.FC = () => {
         subtitle="Al-Noor Mahall — Centralized Digital Administration | Live MongoDB Database"
         breadcrumb={[{ label: 'Dashboard' }]}
         action={
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-500">Live Database Connected</span>
-            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <Button
+              icon={<UserPlus size={16} />}
+              onClick={() => navigate('/app/members?action=add')}
+            >
+              Add Member
+            </Button>
+            <Button
+              variant="outline"
+              icon={<Plus size={16} />}
+              onClick={() => navigate('/app/families?action=add')}
+            >
+              Add Family
+            </Button>
+            <div className="hidden sm:flex items-center gap-2 pl-2 border-l border-gray-200">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-xs text-gray-500">Live DB</span>
+            </div>
           </div>
         }
       />
@@ -333,6 +350,22 @@ const SuperAdminDashboard: React.FC = () => {
             <CardTitle>Administrative Directory</CardTitle>
           </CardHeader>
           <div className="flex flex-col gap-2.5">
+            <div className="grid grid-cols-2 gap-2 mb-2 pb-2 border-b border-gray-100">
+              <Link
+                to="/app/members?action=add"
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-xs border border-emerald-200 transition-colors"
+              >
+                <UserPlus size={14} />
+                <span>+ Add Member</span>
+              </Link>
+              <Link
+                to="/app/families?action=add"
+                className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 font-semibold text-xs border border-blue-200 transition-colors"
+              >
+                <Plus size={14} />
+                <span>+ Add Family</span>
+              </Link>
+            </div>
             <Link
               to="/app/members"
               className="flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-emerald-50 hover:text-emerald-700 transition-colors border border-gray-100 text-sm font-medium text-gray-700"

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Search,
   Plus,
@@ -17,7 +17,7 @@ import {
   GraduationCap,
   FileText,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { PageHeader } from '../../../components/ui/EmptyState';
 import Card from '../../../components/ui/Card';
@@ -46,6 +46,7 @@ const RELATIONSHIPS = [
 
 const MembersPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Filters
   const [search, setSearch] = useState('');
@@ -58,6 +59,15 @@ const MembersPage: React.FC = () => {
   const [editingMember, setEditingMember] = useState<any | null>(null);
   const [viewingMember, setViewingMember] = useState<any | null>(null);
   const [deactivatingMember, setDeactivatingMember] = useState<any | null>(null);
+
+  // Auto-open Add Modal if action=add is passed via query param
+  useEffect(() => {
+    if (searchParams.get('action') === 'add') {
+      setIsAddModalOpen(true);
+      searchParams.delete('action');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Messages
   const [formError, setFormError] = useState<string | null>(null);

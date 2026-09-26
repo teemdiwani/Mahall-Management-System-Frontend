@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   ArrowRight,
   ExternalLink,
+  Heart,
 } from 'lucide-react';
 import Card from '../../../components/ui/Card';
 import Badge, { PaymentStatusBadge } from '../../../components/ui/Badge';
@@ -184,11 +185,18 @@ export const MyPaymentsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => navigate('/app/welfare-donation')}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-bold shadow-xs transition-colors"
+          >
+            <Heart size={14} className="text-emerald-600 fill-emerald-600" />
+            <span>Welfare & Zakat Donation</span>
+          </button>
           <button
             onClick={handleTrigger28thCheck}
             disabled={isRefreshingDues}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 text-xs font-semibold shadow-sm transition-colors disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-200 text-gray-700 bg-white hover:bg-gray-50 text-xs font-semibold shadow-xs transition-colors disabled:opacity-60"
           >
             <RefreshCw size={13} className={isRefreshingDues ? 'animate-spin text-emerald-600' : ''} />
             <span>Check 28th Dues</span>

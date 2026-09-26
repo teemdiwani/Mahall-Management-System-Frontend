@@ -34,15 +34,21 @@ const navItems: NavItem[] = [
     key: 'members',
     label: 'Members',
     icon: <Users size={18} />,
-    href: '/app/members',
     roles: ['super_admin', 'secretary', 'committee_member'],
+    children: [
+      { key: 'members-list', label: 'Census Roster', icon: <Users size={16} />, href: '/app/members', roles: ['super_admin', 'secretary', 'committee_member'] },
+      { key: 'members-add', label: '+ Add Member', icon: <UserCheck size={16} />, href: '/app/members?action=add', roles: ['super_admin', 'secretary'] },
+    ],
   },
   {
     key: 'families',
     label: 'Families',
     icon: <Home size={18} />,
-    href: '/app/families',
     roles: ['super_admin', 'secretary', 'family_head', 'committee_member'],
+    children: [
+      { key: 'families-list', label: 'Registered Families', icon: <Home size={16} />, href: '/app/families', roles: ['super_admin', 'secretary', 'family_head', 'committee_member'] },
+      { key: 'families-add', label: '+ Add Family', icon: <Building2 size={16} />, href: '/app/families?action=add', roles: ['super_admin', 'secretary'] },
+    ],
   },
   {
     key: 'my-family',
@@ -50,6 +56,13 @@ const navItems: NavItem[] = [
     icon: <Home size={18} />,
     href: '/app/my-family',
     roles: ['member', 'volunteer'],
+  },
+  {
+    key: 'welfare-donation',
+    label: 'Welfare Donation',
+    icon: <HeartHandshake size={18} />,
+    href: '/app/welfare-donation',
+    roles: ['member', 'family_head', 'volunteer', 'super_admin'],
   },
   {
     key: 'finance',
@@ -214,7 +227,7 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const { user, logout } = useAuth();
-  const [openGroups, setOpenGroups] = useState<string[]>(['finance', 'welfare']);
+  const [openGroups, setOpenGroups] = useState<string[]>(['finance', 'welfare', 'members', 'families']);
 
   if (!user) return null;
 

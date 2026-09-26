@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Plus,
   Search,
@@ -58,6 +59,7 @@ const RELATIONSHIPS = [
 
 const FamiliesPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Tab State
   const [activeTab, setActiveTab] = useState<'families' | 'requests'>('families');
@@ -73,6 +75,15 @@ const FamiliesPage: React.FC = () => {
 
   // Modals
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // Auto-open Add Modal if action=add is passed via query param
+  useEffect(() => {
+    if (searchParams.get('action') === 'add') {
+      setIsAddModalOpen(true);
+      searchParams.delete('action');
+      setSearchParams(searchParams, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [editingMember, setEditingMember] = useState<any | null>(null);
   const [removingMember, setRemovingMember] = useState<any | null>(null);
