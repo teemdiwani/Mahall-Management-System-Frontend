@@ -44,7 +44,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      await authApi.login(email, password);
+      const res = await authApi.login(email, password);
+      if (res.data?.token) {
+        localStorage.setItem('auth_token', res.data.token);
+      }
       await fetchCurrentUser();
       return true;
     } catch {
@@ -56,12 +59,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const googleLogin = async (credential: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      await authApi.googleAuth(credential);
+      const res = await authApi.googleAuth(credential);
+      if (res.data?.token) {
+        localStorage.setItem('auth_token', res.data.token);
+      }
       await fetchCurrentUser();
       return true;
-    } catch {
+    } catch (err) {
       setIsLoading(false);
-      return false;
+      throw err;
     }
   };
 
@@ -71,6 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (e) {
       console.error('Logout error:', e);
     } finally {
+      localStorage.removeItem('auth_token');
       setAuthData(null);
     }
   };

@@ -4,13 +4,30 @@ import { Mail, Lock, User, Phone, AlertCircle, CheckCircle } from 'lucide-react'
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import { authApi } from '../../api/authApi';
+import { useAuth } from '../../context/AuthContext';
+import GoogleSignInButton from '../../components/auth/GoogleSignInButton';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { googleLogin } = useAuth();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' });
+
+  const handleGoogleAuth = async (credential: string) => {
+    setError('');
+    setLoading(true);
+    try {
+      await googleLogin(credential);
+      setSuccess(true);
+      setTimeout(() => navigate('/app/dashboard'), 1000);
+    } catch (err: any) {
+      setError(err?.message || 'Google registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,7 +89,24 @@ const RegisterPage: React.FC = () => {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <>
+              {/* Google Sign Up */}
+              <div className="mb-6">
+                <GoogleSignInButton
+                  onSuccess={handleGoogleAuth}
+                  onError={(err) => setError(err)}
+                  disabled={loading}
+                  textType="signup_with"
+                />
+              </div>
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex-1 h-px bg-gray-200" />
+                <span className="text-xs text-gray-400 font-medium">OR REGISTER WITH EMAIL</span>
+                <div className="flex-1 h-px bg-gray-200" />
+              </div>
+
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <Input
                 label="Full Name"
                 value={form.name}
@@ -120,6 +154,7 @@ const RegisterPage: React.FC = () => {
                 Create Account
               </Button>
             </form>
+            </>
           )}
 
           <p className="text-center text-sm text-gray-500 mt-4">

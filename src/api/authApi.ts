@@ -45,6 +45,10 @@ export const authApi = {
     return apiClient.post('/auth/google', { credential });
   },
 
+  getAuthConfig: async (): Promise<{ data: { googleClientId: string } }> => {
+    return apiClient.get('/auth/config');
+  },
+
   getMe: async (): Promise<{ data: AuthMeResponse }> => {
     return apiClient.get('/auth/me');
   },
