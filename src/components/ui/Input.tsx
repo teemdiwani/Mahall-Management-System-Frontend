@@ -18,17 +18,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {props.required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
-        <div className="relative">
+        <div className="relative flex items-center">
           {icon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none flex items-center justify-center">
               {icon}
             </div>
           )}
           <input
             ref={ref}
-            className={`w-full rounded-xl border text-base sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 outline-none transition-all
-              ${icon ? 'pl-10' : ''}
-              ${iconRight ? 'pr-10' : ''}
+            className={`w-full rounded-xl border text-base sm:text-sm py-2 sm:py-2.5 outline-none transition-all
+              ${icon ? 'pl-11 sm:pl-11' : 'pl-3.5 sm:pl-4'}
+              ${iconRight ? 'pr-11 sm:pr-11' : 'pr-3.5 sm:pr-4'}
               ${error
                 ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-100'
                 : 'border-gray-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100'
@@ -37,7 +37,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
           {iconRight && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+            <div className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
               {iconRight}
             </div>
           )}
