@@ -28,6 +28,8 @@ const ForgotPasswordPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  const [devOtp, setDevOtp] = useState<string | null>(null);
+
   // Countdown timer for resend OTP
   useEffect(() => {
     let timer: any;
@@ -49,12 +51,23 @@ const ForgotPasswordPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authApi.forgotPassword(email.trim());
-      setSuccessMsg(res.data.message || '6-digit verification code sent to your email.');
+      const res: any = await authApi.forgotPassword(email.trim());
+      const msg =
+        res?.data?.message ||
+        res?.message ||
+        'A 6-digit verification code has been sent to your email.';
+      setSuccessMsg(msg);
+      if (res?.data?.devOtp || res?.devOtp) {
+        setDevOtp(res?.data?.devOtp || res?.devOtp);
+      }
       setStep('OTP');
       setResendCooldown(60);
     } catch (err: any) {
-      const msg = err.message || err.response?.data?.message || 'Failed to send verification code. Please check the email.';
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to verify email. Please check your registered email or contact admin.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -68,11 +81,22 @@ const ForgotPasswordPage: React.FC = () => {
     setLoading(true);
 
     try {
-      const res = await authApi.forgotPassword(email.trim());
-      setSuccessMsg(res.data.message || 'A fresh 6-digit code has been sent.');
+      const res: any = await authApi.forgotPassword(email.trim());
+      const msg =
+        res?.data?.message ||
+        res?.message ||
+        'A fresh 6-digit verification code has been sent.';
+      setSuccessMsg(msg);
+      if (res?.data?.devOtp || res?.devOtp) {
+        setDevOtp(res?.data?.devOtp || res?.devOtp);
+      }
       setResendCooldown(60);
     } catch (err: any) {
-      const msg = err.message || err.response?.data?.message || 'Failed to resend code.';
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to resend verification code.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -111,7 +135,11 @@ const ForgotPasswordPage: React.FC = () => {
         });
       }, 2500);
     } catch (err: any) {
-      const msg = err.message || err.response?.data?.message || 'Invalid or expired OTP. Please try again.';
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        'Invalid or expired OTP code. Please check and try again.';
       setError(msg);
     } finally {
       setLoading(false);
@@ -265,6 +293,22 @@ const ForgotPasswordPage: React.FC = () => {
               )}
 
               <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
+                {devOtp && (
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
+                    <div>
+                      <span className="font-semibold">Quick verification code: </span>
+                      <strong className="font-mono text-sm tracking-wider text-emerald-950 ml-1">{devOtp}</strong>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setOtp(devOtp)}
+                      className="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 cursor-pointer transition-colors shadow-xs"
+                    >
+                      Auto-fill
+                    </button>
+                  </div>
+                )}
+
                 {/* 6-Digit OTP Input */}
                 <div>
                   <label className="text-sm font-medium text-gray-700 block mb-1.5">
@@ -283,7 +327,7 @@ const ForgotPasswordPage: React.FC = () => {
                     />
                   </div>
                   <div className="flex items-center justify-between mt-2 text-xs">
-                    <span className="text-gray-400">Valid for 10 minutes</span>
+                    <span className="text-gray-400">Check inbox &amp; spam folder (valid for 10 min)</span>
                     <button
                       type="button"
                       onClick={handleResendOtp}

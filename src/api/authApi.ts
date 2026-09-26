@@ -57,15 +57,15 @@ export const authApi = {
     return apiClient.post('/auth/logout');
   },
 
-  forgotPassword: async (email: string): Promise<{ data: { email: string; message: string } }> => {
+  forgotPassword: async (email: string): Promise<any> => {
     return apiClient.post('/auth/forgot-password', { email });
   },
 
-  verifyResetOtp: async (email: string, otp: string): Promise<{ data: { valid: boolean; message: string } }> => {
+  verifyResetOtp: async (email: string, otp: string): Promise<any> => {
     return apiClient.post('/auth/verify-reset-otp', { email, otp });
   },
 
-  resetPassword: async (email: string, otp: string, newPassword: string): Promise<{ data: { success: boolean; message: string } }> => {
+  resetPassword: async (email: string, otp: string, newPassword: string): Promise<any> => {
     return apiClient.post('/auth/reset-password', { email, otp, newPassword });
   },
 };
