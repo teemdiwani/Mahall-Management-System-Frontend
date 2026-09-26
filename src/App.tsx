@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { PushNotificationProvider } from './context/PushNotificationContext';
 
 // Layouts
 import PublicLayout from './components/layout/PublicLayout';
@@ -96,95 +97,97 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Public Website */}
-          <Route path="/" element={<PublicLayout />}>
-            <Route index element={<HomePage />} />
-            <Route path="about" element={<AboutPage />} />
-            <Route path="mosque" element={<MosquePublicPage />} />
-            <Route path="madrasa" element={<MadrasaPublicPage />} />
-            <Route path="services" element={<ServicesPublicPage />} />
-            <Route path="events" element={<EventsPublicPage />} />
-            <Route path="announcements" element={<AnnouncementsPublicPage />} />
-            <Route path="contact" element={<ContactPage />} />
-          </Route>
+        <PushNotificationProvider>
+          <Routes>
+            {/* Public Website */}
+            <Route path="/" element={<PublicLayout />}>
+              <Route index element={<HomePage />} />
+              <Route path="about" element={<AboutPage />} />
+              <Route path="mosque" element={<MosquePublicPage />} />
+              <Route path="madrasa" element={<MadrasaPublicPage />} />
+              <Route path="services" element={<ServicesPublicPage />} />
+              <Route path="events" element={<EventsPublicPage />} />
+              <Route path="announcements" element={<AnnouncementsPublicPage />} />
+              <Route path="contact" element={<ContactPage />} />
+            </Route>
 
-          {/* Auth */}
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            {/* Auth */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-          {/* Standalone Official Invoice (Non-sidebar, non-header page for print & download) */}
-          <Route path="/app/payments/:id/invoice" element={<OfficialInvoicePage />} />
-          <Route path="/payments/:id/invoice" element={<OfficialInvoicePage />} />
+            {/* Standalone Official Invoice (Non-sidebar, non-header page for print & download) */}
+            <Route path="/app/payments/:id/invoice" element={<OfficialInvoicePage />} />
+            <Route path="/payments/:id/invoice" element={<OfficialInvoicePage />} />
 
-          {/* Dashboard App */}
-          <Route path="/app" element={<DashboardLayout />}>
-            <Route index element={<Navigate to="/app/dashboard" replace />} />
-            <Route path="dashboard" element={<DashboardRouter />} />
+            {/* Dashboard App */}
+            <Route path="/app" element={<DashboardLayout />}>
+              <Route index element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="dashboard" element={<DashboardRouter />} />
 
-            {/* Profile & Settings */}
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="settings" element={<PlaceholderPage title="System Settings" />} />
+              {/* Profile & Settings */}
+              <Route path="profile" element={<ProfilePage />} />
+              <Route path="settings" element={<PlaceholderPage title="System Settings" />} />
 
-            {/* Super Admin */}
-            <Route path="users" element={<UsersPage />} />
-            <Route path="roles" element={<UsersPage />} />
+              {/* Super Admin */}
+              <Route path="users" element={<UsersPage />} />
+              <Route path="roles" element={<UsersPage />} />
 
-            {/* Member */}
-            <Route path="my-family" element={<MyFamilyPage />} />
-            <Route path="my-payments" element={<MyPaymentsPage />} />
-            <Route path="welfare-donation" element={<WelfareDonationPage />} />
-            <Route path="my-madrasa" element={<MadrasaParentPortalPage />} />
+              {/* Member */}
+              <Route path="my-family" element={<MyFamilyPage />} />
+              <Route path="my-payments" element={<MyPaymentsPage />} />
+              <Route path="welfare-donation" element={<WelfareDonationPage />} />
+              <Route path="my-madrasa" element={<MadrasaParentPortalPage />} />
 
-            {/* Shared Core Modules */}
-            <Route path="members" element={<MembersPage />} />
-            <Route path="families" element={<FamiliesPage />} />
-            <Route path="events" element={<EventsPage />} />
-            <Route path="applications" element={<ApplicationsPage />} />
-            <Route path="announcements" element={<AnnouncementsPage />} />
-            <Route path="volunteers" element={<VolunteersPage />} />
-            <Route path="funeral" element={<FuneralPage />} />
-            <Route path="marriage" element={<MarriagePage />} />
-            <Route path="committee" element={<CommitteePage />} />
-            <Route path="assets" element={<AssetsPage />} />
-            <Route path="hajj-umrah" element={<HajjUmrahPage />} />
-            <Route path="ramadan" element={<RamadanPage />} />
+              {/* Shared Core Modules */}
+              <Route path="members" element={<MembersPage />} />
+              <Route path="families" element={<FamiliesPage />} />
+              <Route path="events" element={<EventsPage />} />
+              <Route path="applications" element={<ApplicationsPage />} />
+              <Route path="announcements" element={<AnnouncementsPage />} />
+              <Route path="volunteers" element={<VolunteersPage />} />
+              <Route path="funeral" element={<FuneralPage />} />
+              <Route path="marriage" element={<MarriagePage />} />
+              <Route path="committee" element={<CommitteePage />} />
+              <Route path="assets" element={<AssetsPage />} />
+              <Route path="hajj-umrah" element={<HajjUmrahPage />} />
+              <Route path="ramadan" element={<RamadanPage />} />
 
-            {/* Finance Sub-routes */}
-            <Route path="finance" element={<TreasurerDashboard />} />
-            <Route path="finance/payments" element={<PaymentsPage />} />
-            <Route path="finance/donations" element={<DonationsPage />} />
-            <Route path="finance/expenses" element={<ExpensesPage />} />
-            <Route path="finance/reports" element={<FinanceReportsPage />} />
+              {/* Finance Sub-routes */}
+              <Route path="finance" element={<TreasurerDashboard />} />
+              <Route path="finance/payments" element={<PaymentsPage />} />
+              <Route path="finance/donations" element={<DonationsPage />} />
+              <Route path="finance/expenses" element={<ExpensesPage />} />
+              <Route path="finance/reports" element={<FinanceReportsPage />} />
 
-            {/* Welfare Sub-routes */}
-            <Route path="welfare" element={<WelfareDashboard />} />
-            <Route path="welfare/cases" element={<WelfareCasesPage />} />
-            <Route path="welfare/zakat" element={<ZakatPage />} />
-            <Route path="welfare/beneficiaries" element={<BeneficiariesPage />} />
+              {/* Welfare Sub-routes */}
+              <Route path="welfare" element={<WelfareDashboard />} />
+              <Route path="welfare/cases" element={<WelfareCasesPage />} />
+              <Route path="welfare/zakat" element={<ZakatPage />} />
+              <Route path="welfare/beneficiaries" element={<BeneficiariesPage />} />
 
-            {/* Madrasa Sub-routes */}
-            <Route path="madrasa" element={<MadrasaDashboard />} />
-            <Route path="madrasa/directory" element={<MadrasasPage />} />
-            <Route path="madrasa/:id" element={<MadrasaDetailPage />} />
-            <Route path="madrasa/classes" element={<MadrasaClassesPage />} />
-            <Route path="madrasa/students" element={<StudentsPage />} />
-            <Route path="madrasa/teachers" element={<TeachersPage />} />
-            <Route path="madrasa/timetables" element={<MadrasaTimetablePage />} />
-            <Route path="madrasa/results" element={<MadrasaResultsPage />} />
-            <Route path="madrasa/fees" element={<MadrasaFeesPage />} />
-            <Route path="madrasa/announcements" element={<MadrasaAnnouncementsPage />} />
+              {/* Madrasa Sub-routes */}
+              <Route path="madrasa" element={<MadrasaDashboard />} />
+              <Route path="madrasa/directory" element={<MadrasasPage />} />
+              <Route path="madrasa/:id" element={<MadrasaDetailPage />} />
+              <Route path="madrasa/classes" element={<MadrasaClassesPage />} />
+              <Route path="madrasa/students" element={<StudentsPage />} />
+              <Route path="madrasa/teachers" element={<TeachersPage />} />
+              <Route path="madrasa/timetables" element={<MadrasaTimetablePage />} />
+              <Route path="madrasa/results" element={<MadrasaResultsPage />} />
+              <Route path="madrasa/fees" element={<MadrasaFeesPage />} />
+              <Route path="madrasa/announcements" element={<MadrasaAnnouncementsPage />} />
 
-            {/* Mosque Sub-routes */}
-            <Route path="mosque" element={<MosqueDashboard />} />
-            <Route path="mosque/prayer" element={<MosquePrayerPage />} />
-            <Route path="mosque/programs" element={<MosqueProgramsPage />} />
-          </Route>
+              {/* Mosque Sub-routes */}
+              <Route path="mosque" element={<MosqueDashboard />} />
+              <Route path="mosque/prayer" element={<MosquePrayerPage />} />
+              <Route path="mosque/programs" element={<MosqueProgramsPage />} />
+            </Route>
 
-          {/* Catch all */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* Catch all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </PushNotificationProvider>
       </AuthProvider>
     </BrowserRouter>
   );
