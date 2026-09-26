@@ -77,22 +77,22 @@ const PaymentsPage: React.FC = () => {
       />
 
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
         {[
           { label: 'Total Income (Paid)', value: `₹${(overview.totalIncome || 0).toLocaleString()}`, color: 'text-emerald-700 bg-emerald-50' },
           { label: 'Current Month Collected', value: `₹${(overview.collectedMonthly || 0).toLocaleString()}`, color: 'text-blue-700 bg-blue-50' },
           { label: 'Current Month Pending', value: `₹${(overview.pendingMonthly || 0).toLocaleString()}`, color: 'text-amber-700 bg-amber-50' },
           { label: 'Total Records in DB', value: String(pagination.total || items.length), color: 'text-purple-700 bg-purple-50' },
         ].map(s => (
-          <div key={s.label} className={`${s.color} rounded-2xl p-4`}>
-            <p className="text-xl font-bold">{s.value}</p>
-            <p className="text-sm opacity-80">{s.label}</p>
+          <div key={s.label} className={`${s.color} rounded-xl sm:rounded-2xl p-3 sm:p-4`}>
+            <p className="text-lg sm:text-xl font-bold">{s.value}</p>
+            <p className="text-xs sm:text-sm opacity-80 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex items-center justify-between gap-4 mb-4 flex-wrap">
+      <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
         <Tabs
           activeTab={activeTab}
           onChange={tab => { setActiveTab(tab); setPage(1); }}
@@ -106,13 +106,13 @@ const PaymentsPage: React.FC = () => {
             { key: 'overdue', label: 'Overdue' },
           ]}
         />
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1); }}
             placeholder="Search family..."
-            className="pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-white focus:border-emerald-400 outline-none w-44"
+            className="pl-9 pr-4 py-2 text-base sm:text-sm rounded-xl border border-gray-200 bg-white focus:border-emerald-400 outline-none w-full sm:w-48"
           />
         </div>
       </div>
@@ -169,7 +169,7 @@ const PaymentsPage: React.FC = () => {
             </table>
           </div>
         )}
-        <div className="flex justify-between items-center px-4 py-3 border-t border-gray-50">
+        <div className="flex flex-col sm:flex-row justify-between items-center px-4 py-3 border-t border-gray-50 gap-2.5">
           <span className="text-xs text-gray-400">{pagination.total || items.length} records</span>
           <Pagination currentPage={page} totalPages={pagination.totalPages || 1} onPageChange={setPage} />
         </div>

@@ -295,13 +295,13 @@ export const MyPaymentsPage: React.FC = () => {
       {/* Payments Table Card */}
       <Card padding="none" className="overflow-hidden border-gray-100 shadow-sm">
         {/* Tabs Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50/60 flex-wrap gap-3">
-          <div className="flex items-center gap-1.5 p-1 bg-gray-200/60 rounded-xl">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-gray-50/60 flex-wrap gap-2.5">
+          <div className="flex items-center gap-1.5 p-1 bg-gray-200/60 rounded-xl overflow-x-auto max-w-full scrollbar-none">
             {(['ALL', 'PENDING', 'PAID'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 whitespace-nowrap ${
                   activeTab === tab
                     ? 'bg-white text-emerald-800 shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
@@ -314,7 +314,7 @@ export const MyPaymentsPage: React.FC = () => {
             ))}
           </div>
 
-          <p className="text-xs text-gray-400">
+          <p className="text-[11px] sm:text-xs text-gray-400">
             Official receipts are verified with digital QR & seal
           </p>
         </div>
@@ -410,10 +410,10 @@ export const MyPaymentsPage: React.FC = () => {
                   </div>
 
                   {/* Right Column: Amount & Action Button */}
-                  <div className="flex items-center justify-between md:justify-end gap-5 pl-14 md:pl-0 border-t md:border-t-0 pt-3 md:pt-0 border-gray-100">
+                  <div className="flex items-center justify-between md:justify-end gap-3 sm:gap-5 border-t md:border-t-0 pt-3 md:pt-0 border-gray-100 flex-wrap sm:flex-nowrap">
                     <div className="text-left md:text-right">
-                      <p className="text-xs text-gray-400 uppercase tracking-wider font-semibold">Amount</p>
-                      <p className="text-lg font-black text-gray-900 font-mono">
+                      <p className="text-[11px] text-gray-400 uppercase tracking-wider font-semibold">Amount</p>
+                      <p className="text-base sm:text-lg font-black text-gray-900 font-mono">
                         ₹{Number(payment.amount).toFixed(2)}
                       </p>
                     </div>
@@ -424,12 +424,12 @@ export const MyPaymentsPage: React.FC = () => {
                         <button
                           onClick={() => handlePayWithRazorpay(payment)}
                           disabled={isProcessing}
-                          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold shadow-md shadow-emerald-600/25 transition-all disabled:opacity-50"
+                          className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold shadow-md shadow-emerald-600/25 transition-all disabled:opacity-50"
                         >
                           {isProcessing ? (
                             <>
                               <Loader2 size={14} className="animate-spin" />
-                              <span>Opening Razorpay...</span>
+                              <span>Opening...</span>
                             </>
                           ) : (
                             <>
@@ -441,7 +441,7 @@ export const MyPaymentsPage: React.FC = () => {
                       ) : isPaid ? (
                         <button
                           onClick={() => handleOpenInvoice(payment)}
-                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 text-xs font-bold transition-all shadow-sm"
                         >
                           <Download size={14} className="text-emerald-700" />
                           <span>Official Invoice</span>

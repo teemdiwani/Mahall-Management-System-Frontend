@@ -107,20 +107,20 @@ const MemberDashboard: React.FC = () => {
   return (
     <div>
       {/* Welcome */}
-      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-3xl p-6 mb-6 text-white relative overflow-hidden">
+      <div className="bg-gradient-to-r from-emerald-600 to-teal-700 rounded-2xl sm:rounded-3xl p-4 sm:p-6 mb-4 sm:mb-6 text-white relative overflow-hidden shadow-sm">
         <div className="absolute top-0 right-0 w-48 h-48 rounded-full bg-white/5 -translate-y-1/4 translate-x-1/4" />
         <div className="absolute bottom-0 right-16 w-32 h-32 rounded-full bg-white/5 translate-y-1/4" />
         <div className="relative">
-          <p className="text-emerald-100 text-sm mb-1">Assalamu Alaikum,</p>
-          <h1 className="text-2xl font-bold mb-0.5">{user?.name ?? 'Member'}</h1>
-          <p className="text-emerald-100 text-sm">
+          <p className="text-emerald-100 text-xs sm:text-sm mb-1">Assalamu Alaikum,</p>
+          <h1 className="text-xl sm:text-2xl font-bold mb-0.5">{user?.name ?? 'Member'}</h1>
+          <p className="text-emerald-100 text-xs sm:text-sm">
             Welcome to Al-Noor Mahall · {d?.family?.familyCode ? `Family Code: ${d.family.familyCode}` : 'Member Portal'}
           </p>
         </div>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
         <StatCard
           label="My Family"
           value={`${familyCount} members`}

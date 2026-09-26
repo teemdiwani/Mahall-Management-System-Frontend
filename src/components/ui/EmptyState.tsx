@@ -65,16 +65,16 @@ export const StatCard: React.FC<StatCardProps> = ({
     'text-gray-500';
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between mb-3">
-        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconBg}`}>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-3.5 sm:p-5 hover:shadow-md transition-shadow min-w-0">
+      <div className="flex items-start justify-between mb-2.5 sm:mb-3">
+        <div className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0 ${iconBg}`}>
           {icon}
         </div>
-        {change && <span className={`text-xs font-medium ${changeColor}`}>{change}</span>}
+        {change && <span className={`text-[11px] sm:text-xs font-semibold px-1.5 py-0.5 rounded-md bg-gray-50 ${changeColor}`}>{change}</span>}
       </div>
-      <p className="text-2xl font-bold text-gray-800 mb-0.5">{value}</p>
-      <p className="text-sm text-gray-500">{label}</p>
-      {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+      <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-0.5 truncate" title={String(value)}>{value}</p>
+      <p className="text-xs sm:text-sm text-gray-500 font-medium truncate">{label}</p>
+      {subtitle && <p className="text-[11px] sm:text-xs text-gray-400 mt-1 truncate">{subtitle}</p>}
     </div>
   );
 };
@@ -86,21 +86,21 @@ export const PageHeader: React.FC<{
   action?: React.ReactNode;
   breadcrumb?: { label: string; href?: string }[];
 }> = ({ title, subtitle, action, breadcrumb }) => (
-  <div className="flex items-start justify-between mb-6">
-    <div>
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-6">
+    <div className="min-w-0 flex-1">
       {breadcrumb && (
-        <nav className="flex items-center gap-2 text-xs text-gray-400 mb-1">
+        <nav className="flex items-center gap-1.5 text-xs text-gray-400 mb-1 overflow-x-auto whitespace-nowrap scrollbar-none">
           {breadcrumb.map((crumb, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <span>/</span>}
-              <span className={i === breadcrumb.length - 1 ? 'text-gray-600 font-medium' : ''}>{crumb.label}</span>
+              {i > 0 && <span className="text-gray-300">/</span>}
+              <span className={i === breadcrumb.length - 1 ? 'text-emerald-700 font-semibold' : 'hover:text-gray-600'}>{crumb.label}</span>
             </React.Fragment>
           ))}
         </nav>
       )}
-      <h1 className="text-xl font-bold text-gray-800">{title}</h1>
-      {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
+      <h1 className="text-lg sm:text-xl md:text-2xl font-black text-gray-900 tracking-tight truncate">{title}</h1>
+      {subtitle && <p className="text-xs sm:text-sm text-gray-500 mt-0.5 leading-relaxed">{subtitle}</p>}
     </div>
-    {action && <div className="flex items-center gap-3">{action}</div>}
+    {action && <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 shrink-0">{action}</div>}
   </div>
 );

@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import MobileBottomNav from './MobileBottomNav';
 import { useAuth } from '../../context/AuthContext';
 import { Spinner } from '../ui/EmptyState';
 
 const DashboardLayout: React.FC = () => {
   const { isAuthenticated, isLoading } = useAuth();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarMobileOpen, setSidebarMobileOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -28,20 +30,32 @@ const DashboardLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <Sidebar collapsed={sidebarCollapsed} />
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row relative">
+      <Sidebar
+        collapsed={sidebarCollapsed}
+        mobileOpen={sidebarMobileOpen}
+        onCloseMobile={() => setSidebarMobileOpen(false)}
+      />
+
       <div
-        className="flex-1 flex flex-col min-h-screen transition-all duration-300"
-        style={{ marginLeft: sidebarCollapsed ? 64 : 256 }}
+        className={`flex-1 flex flex-col min-h-screen transition-all duration-300 w-full min-w-0 ${
+          sidebarCollapsed ? 'md:ml-16' : 'md:ml-64'
+        }`}
       >
         <TopBar
-          onToggleSidebar={() => setSidebarCollapsed(c => !c)}
+          onToggleSidebar={() => setSidebarCollapsed((c) => !c)}
           sidebarCollapsed={sidebarCollapsed}
+          onOpenMobileSidebar={() => setSidebarMobileOpen(true)}
         />
-        <main className="flex-1 p-6 overflow-auto">
-          <Outlet />
+        <main className="flex-1 p-3 sm:p-5 md:p-6 pb-24 md:pb-6 overflow-x-hidden">
+          <div className="max-w-7xl mx-auto w-full">
+            <Outlet />
+          </div>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <MobileBottomNav onOpenSidebar={() => setSidebarMobileOpen(true)} />
     </div>
   );
 };

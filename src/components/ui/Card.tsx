@@ -10,9 +10,9 @@ interface CardProps {
 
 const paddingClasses = {
   none: '',
-  sm: 'p-4',
-  md: 'p-5',
-  lg: 'p-6',
+  sm: 'p-3 sm:p-4',
+  md: 'p-3.5 sm:p-5',
+  lg: 'p-4 sm:p-6',
 };
 
 const Card: React.FC<CardProps> = ({
@@ -25,7 +25,7 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-gray-100 shadow-sm 
+      className={`bg-white rounded-2xl border border-gray-100 shadow-sm min-w-0
         ${hover ? 'hover:shadow-md hover:border-gray-200 cursor-pointer transition-all duration-200' : ''}
         ${paddingClasses[padding]}
         ${className}`}
@@ -36,7 +36,7 @@ const Card: React.FC<CardProps> = ({
 };
 
 export const CardHeader: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <div className={`flex items-center justify-between mb-4 ${className}`}>{children}</div>
+  <div className={`flex flex-wrap items-center justify-between gap-2 mb-3 sm:mb-4 ${className}`}>{children}</div>
 );
 
 export const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (

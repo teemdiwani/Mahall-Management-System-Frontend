@@ -219,7 +219,7 @@ const RamadanPage: React.FC = () => {
         subtitle="Live community Iftar sponsorship, daily prayer timetable, and Razorpay Zakat & Fitrah desk"
         breadcrumb={[{ label: 'Dashboard' }, { label: 'Ramadan' }]}
         action={
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold shadow-md shadow-emerald-600/20"
               icon={<Heart size={16} />}
@@ -239,24 +239,24 @@ const RamadanPage: React.FC = () => {
       />
 
       {/* Hero Banner */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 rounded-3xl p-6 sm:p-8 mb-6 text-white relative overflow-hidden shadow-lg">
+      <div className="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 rounded-2xl sm:rounded-3xl p-4 sm:p-8 mb-4 sm:mb-6 text-white relative overflow-hidden shadow-lg">
         <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 right-0 text-[220px] font-bold leading-none text-white opacity-10">☽</div>
+          <div className="absolute top-0 right-0 text-[180px] sm:text-[220px] font-bold leading-none text-white opacity-10">☽</div>
         </div>
-        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-200 text-xs font-semibold mb-3 border border-white/10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-emerald-200 text-xs font-semibold mb-2 sm:mb-3 border border-white/10">
               <Sparkles size={14} className="text-amber-300" />
               <span>Blessed Month of Fasting</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black">Ramadan {s?.hijriYear || '1447 AH'}</h2>
-            <p className="text-emerald-100 text-sm mt-1 max-w-lg leading-relaxed">
+            <h2 className="text-xl sm:text-3xl font-black">Ramadan {s?.hijriYear || '1447 AH'}</h2>
+            <p className="text-emerald-100 text-xs sm:text-sm mt-1 max-w-lg leading-relaxed">
               Support our community Iftar meals, sponsor daily Kanji for hundreds of fasting brothers and sisters, and fulfill your Zakat al-Fitr before Eid prayer.
             </p>
           </div>
           <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-3.5 border border-white/15 text-center sm:text-right">
-              <p className="text-2xl sm:text-3xl font-black text-amber-300">₹{(stats.totalIftarRaised || 0).toLocaleString()}</p>
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl px-5 sm:px-6 py-3 sm:py-3.5 border border-white/15 text-center sm:text-right">
+              <p className="text-xl sm:text-3xl font-black text-amber-300">₹{(stats.totalIftarRaised || 0).toLocaleString()}</p>
               <p className="text-emerald-200 text-xs font-medium">Iftar Fund Raised</p>
             </div>
           </div>
@@ -264,7 +264,7 @@ const RamadanPage: React.FC = () => {
       </div>
 
       {/* Dynamic Stat Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-4 sm:mb-6">
         <StatCard
           label="Iftar Programs"
           value={String(iftarPrograms.length || 30)}

@@ -206,10 +206,10 @@ export const OfficialInvoicePage: React.FC = () => {
       </header>
 
       {/* Main Printable Invoice Body */}
-      <main className="py-6 sm:py-10 px-4 print:p-0 print:m-0">
+      <main className="py-4 sm:py-8 md:py-10 px-2.5 sm:px-4 print:p-0 print:m-0">
         <div
           ref={printRef}
-          className="invoice-paper max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-200/80 p-8 sm:p-14 print:p-4 print:shadow-none print:border-none print:max-w-none print:w-full"
+          className="invoice-paper max-w-4xl mx-auto bg-white rounded-2xl shadow-xl border border-gray-200/80 p-4 sm:p-8 md:p-12 print:p-4 print:shadow-none print:border-none print:max-w-none print:w-full"
         >
           {/* Official Islamic Bismillah Header */}
           <div className="text-center mb-4">
@@ -319,8 +319,8 @@ export const OfficialInvoicePage: React.FC = () => {
           </div>
 
           {/* Itemized Dues Table */}
-          <div className="mb-6 overflow-hidden rounded-xl border border-gray-200">
-            <table className="w-full text-left border-collapse">
+          <div className="mb-6 overflow-x-auto rounded-xl border border-gray-200">
+            <table className="w-full min-w-[500px] text-left border-collapse">
               <thead>
                 <tr className="bg-gray-100 text-gray-700 text-xs font-bold uppercase tracking-wider border-b border-gray-200">
                   <th className="py-3 px-4">#</th>
@@ -402,7 +402,7 @@ export const OfficialInvoicePage: React.FC = () => {
           </div>
 
           {/* Signatures & Seal Section */}
-          <div className="grid grid-cols-3 gap-6 pt-6 border-t border-gray-200 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-6 border-t border-gray-200 items-center sm:items-end">
             <div className="text-center">
               <div className="h-10 border-b border-dashed border-gray-400 mx-auto w-32 flex items-center justify-center">
                 <span className="text-[11px] font-serif italic text-gray-400">Digital Seal</span>

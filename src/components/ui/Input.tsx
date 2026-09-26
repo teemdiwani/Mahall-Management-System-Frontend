@@ -26,7 +26,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             ref={ref}
-            className={`w-full rounded-xl border text-sm px-4 py-2.5 outline-none transition-all
+            className={`w-full rounded-xl border text-base sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 outline-none transition-all
               ${icon ? 'pl-10' : ''}
               ${iconRight ? 'pr-10' : ''}
               ${error
@@ -65,7 +65,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       {label && <label className="text-sm font-medium text-gray-700">{label}{props.required && <span className="text-red-500 ml-1">*</span>}</label>}
       <textarea
         ref={ref}
-        className={`w-full rounded-xl border text-sm px-4 py-2.5 outline-none transition-all resize-none
+        className={`w-full rounded-xl border text-base sm:text-sm px-3.5 sm:px-4 py-2 sm:py-2.5 outline-none transition-all resize-none
           ${error ? 'border-red-300 bg-red-50 focus:border-red-500' : 'border-gray-200 bg-white focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100'}
           placeholder:text-gray-400 ${className}`}
         rows={4}

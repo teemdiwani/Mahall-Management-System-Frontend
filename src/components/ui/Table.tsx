@@ -23,14 +23,14 @@ function Table<T extends Record<string, unknown>>({
   emptyMessage = 'No data found.',
 }: TableProps<T>) {
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-100">
-      <table className="w-full text-sm">
+    <div className="overflow-x-auto rounded-xl border border-gray-100 -mx-1 sm:mx-0">
+      <table className="w-full text-xs sm:text-sm">
         <thead>
           <tr className="bg-gray-50 border-b border-gray-100">
             {columns.map(col => (
               <th
                 key={col.key}
-                className={`px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider ${col.className ?? ''}`}
+                className={`px-3 sm:px-4 py-2.5 sm:py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider whitespace-nowrap ${col.className ?? ''}`}
               >
                 {col.label}
               </th>
@@ -52,7 +52,7 @@ function Table<T extends Record<string, unknown>>({
                 className={`bg-white hover:bg-gray-50 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
               >
                 {columns.map(col => (
-                  <td key={col.key} className={`px-4 py-3 text-gray-700 ${col.className ?? ''}`}>
+                  <td key={col.key} className={`px-3 sm:px-4 py-2.5 sm:py-3 text-gray-700 whitespace-nowrap sm:whitespace-normal ${col.className ?? ''}`}>
                     {col.render ? col.render(row) : String(row[col.key as keyof T] ?? '-')}
                   </td>
                 ))}
@@ -83,11 +83,11 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
   });
 
   return (
-    <div className="flex items-center gap-1">
+    <div className="flex items-center justify-center sm:justify-start gap-1 flex-wrap pt-2">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         ←
       </button>
@@ -95,7 +95,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
         <button
           key={p}
           onClick={() => onPageChange(p)}
-          className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
+          className={`px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-colors
             ${p === currentPage ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
         >
           {p}
@@ -104,7 +104,7 @@ export const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages,
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-3 py-1.5 rounded-lg text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
+        className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm text-gray-600 hover:bg-gray-100 disabled:opacity-40 disabled:cursor-not-allowed"
       >
         →
       </button>

@@ -204,11 +204,15 @@ const navItems: NavItem[] = [
   },
 ];
 
+import { X, LogOut } from 'lucide-react';
+
 interface SidebarProps {
   collapsed: boolean;
+  mobileOpen: boolean;
+  onCloseMobile: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
+const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile }) => {
   const { user, logout } = useAuth();
   const [openGroups, setOpenGroups] = useState<string[]>(['finance', 'welfare']);
 
@@ -227,6 +231,10 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
     );
   };
 
+  const handleNavClick = () => {
+    onCloseMobile();
+  };
+
   const renderItem = (item: NavItem) => {
     if (item.children) {
       const isOpen = openGroups.includes(item.key);
@@ -237,22 +245,23 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
           <button
             onClick={() => toggleGroup(item.key)}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-              text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${collapsed ? 'justify-center' : 'justify-between'}`}
+              text-gray-600 hover:bg-gray-100 hover:text-gray-800 ${collapsed ? 'md:justify-center justify-between' : 'justify-between'}`}
           >
             <div className="flex items-center gap-3">
               <span className="flex-shrink-0">{item.icon}</span>
-              {!collapsed && <span>{item.label}</span>}
+              {(!collapsed || mobileOpen) && <span>{item.label}</span>}
             </div>
-            {!collapsed && (
+            {(!collapsed || mobileOpen) && (
               isOpen ? <ChevronDown size={14} /> : <ChevronRight size={14} />
             )}
           </button>
-          {isOpen && !collapsed && (
+          {isOpen && (!collapsed || mobileOpen) && (
             <div className="ml-9 mt-1 flex flex-col gap-0.5 border-l-2 border-gray-100 pl-3">
               {visibleChildren.map(child => (
                 <NavLink
                   key={child.key}
                   to={child.href!}
+                  onClick={handleNavClick}
                   className={({ isActive }) =>
                     `flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all
                     ${isActive ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'}`
@@ -272,64 +281,90 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed }) => {
       <NavLink
         key={item.key}
         to={item.href!}
+        onClick={handleNavClick}
         className={({ isActive }) =>
           `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
-          ${isActive ? 'bg-emerald-50 text-emerald-700' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'}
-          ${collapsed ? 'justify-center' : ''}`
+          ${isActive ? 'bg-emerald-50 text-emerald-700 font-semibold' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'}
+          ${collapsed && !mobileOpen ? 'md:justify-center' : ''}`
         }
-        title={collapsed ? item.label : undefined}
+        title={collapsed && !mobileOpen ? item.label : undefined}
       >
         <span className="flex-shrink-0">{item.icon}</span>
-        {!collapsed && <span>{item.label}</span>}
+        {(!collapsed || mobileOpen) && <span>{item.label}</span>}
       </NavLink>
     );
   };
 
   return (
-    <aside
-      className={`fixed top-0 left-0 h-full bg-white border-r border-gray-100 flex flex-col z-30 transition-all duration-300
-        ${collapsed ? 'w-16' : 'w-64'}`}
-    >
-      {/* Logo */}
-      <div className={`flex items-center gap-3 px-4 h-16 border-b border-gray-100 flex-shrink-0 ${collapsed ? 'justify-center' : ''}`}>
-        <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center flex-shrink-0">
-          <span className="text-white text-xs font-bold">AN</span>
-        </div>
-        {!collapsed && (
-          <div>
-            <p className="text-sm font-bold text-gray-800 leading-tight">Al-Noor</p>
-            <p className="text-xs text-emerald-600 font-medium leading-tight">MahallConnect</p>
-          </div>
-        )}
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs z-40 md:hidden transition-opacity duration-300"
+          onClick={onCloseMobile}
+          aria-hidden="true"
+        />
+      )}
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto py-4 px-2 flex flex-col gap-0.5 scrollbar-thin">
-        {visibleItems.map(renderItem)}
-      </nav>
-
-      {/* User section */}
-      <div className={`border-t border-gray-100 p-3 flex-shrink-0 ${collapsed ? 'flex justify-center' : ''}`}>
-        {!collapsed ? (
+      {/* Sidebar Panel */}
+      <aside
+        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-100 flex flex-col z-50 transition-all duration-300 ease-in-out
+          ${mobileOpen ? 'translate-x-0 w-72 shadow-2xl' : '-translate-x-full md:translate-x-0'}
+          ${collapsed ? 'md:w-16' : 'md:w-64'}`}
+      >
+        {/* Logo & Mobile Close Header */}
+        <div className={`flex items-center justify-between px-4 h-16 border-b border-gray-100 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:justify-center' : ''}`}>
           <div className="flex items-center gap-3">
-            <Avatar name={user.name} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-              <p className="text-xs text-gray-400">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <span className="text-white text-xs font-bold">AN</span>
             </div>
-            <button
-              onClick={logout}
-              title="Sign out"
-              className="text-gray-400 hover:text-red-500 transition-colors p-1"
-            >
-              <HelpCircle size={16} />
-            </button>
+            {(!collapsed || mobileOpen) && (
+              <div>
+                <p className="text-sm font-bold text-gray-800 leading-tight">Al-Noor</p>
+                <p className="text-xs text-emerald-600 font-medium leading-tight">MahallConnect</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <Avatar name={user.name} size="sm" />
-        )}
-      </div>
-    </aside>
+
+          {/* Mobile close button */}
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            aria-label="Close navigation"
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto py-4 px-2 flex flex-col gap-0.5 scrollbar-thin">
+          {visibleItems.map(renderItem)}
+        </nav>
+
+        {/* User section */}
+        <div className={`border-t border-gray-100 p-3 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:flex md:justify-center' : ''}`}>
+          {(!collapsed || mobileOpen) ? (
+            <div className="flex items-center gap-3">
+              <Avatar name={user.name} size="sm" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
+                <p className="text-xs text-gray-400">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
+              </div>
+              <button
+                onClick={logout}
+                title="Sign out"
+                className="text-gray-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-gray-50 cursor-pointer"
+              >
+                <LogOut size={16} />
+              </button>
+            </div>
+          ) : (
+            <Avatar name={user.name} size="sm" />
+          )}
+        </div>
+      </aside>
+    </>
   );
 };
 

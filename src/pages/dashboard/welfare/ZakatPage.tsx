@@ -236,28 +236,28 @@ const ZakatPage: React.FC = () => {
                   </div>
                 ) : (
                   recentContributions.map((c: any) => (
-                    <div key={c._id} className="flex items-center justify-between p-3.5 bg-gray-50 hover:bg-gray-100/70 rounded-xl transition-all">
-                      <div className="flex items-center gap-3">
+                    <div key={c._id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 bg-gray-50 hover:bg-gray-100/70 rounded-xl transition-all gap-3">
+                      <div className="flex items-center gap-3 min-w-0">
                         <Avatar name={c.familyId?.name || c.memberId?.name || 'Zakat Donor'} size="sm" />
-                        <div>
-                          <p className="text-sm font-semibold text-gray-900">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-gray-900 truncate">
                             {c.familyId?.name || c.memberId?.name || 'Verified Mahall Donor'}
                           </p>
-                          <p className="text-xs text-gray-500">{c.notes || `${c.type} Fund Contribution`}</p>
+                          <p className="text-xs text-gray-500 truncate">{c.notes || `${c.type} Fund Contribution`}</p>
                           <p className="text-[11px] text-gray-400 mt-0.5">
                             Receipt: <span className="font-mono text-emerald-700 font-semibold">{c.receiptNumber || 'OFFICIAL'}</span> · {new Date(c.paidAt || c.createdAt).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <p className="text-sm font-black text-emerald-700">₹{c.amount?.toLocaleString()}</p>
+                      <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200/60">
+                        <div className="text-left sm:text-right">
+                          <p className="text-sm font-black text-emerald-700 font-mono">₹{c.amount?.toLocaleString()}</p>
                           <Badge variant="emerald" size="sm">PAID</Badge>
                         </div>
                         <button
                           onClick={() => navigate(`/app/payments/${c._id}/invoice`)}
                           title="View Official Mahall Invoice"
-                          className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-emerald-700 hover:border-emerald-300 transition-all shadow-xs"
+                          className="p-2 rounded-lg bg-white border border-gray-200 text-gray-600 hover:text-emerald-700 hover:border-emerald-300 transition-all shadow-xs shrink-0"
                         >
                           <ExternalLink size={15} />
                         </button>
@@ -280,17 +280,21 @@ const ZakatPage: React.FC = () => {
                   <p className="text-sm text-gray-400 text-center py-8">No disbursements recorded yet</p>
                 ) : (
                   recentDistributions.map((item: any) => (
-                    <div key={item._id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                      <Avatar name={item.applicant?.name || 'Recipient'} size="sm" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-800">{item.applicant?.name || item.description}</p>
-                        <p className="text-xs text-gray-500">{item.description}</p>
-                        <p className="text-xs text-gray-400">{new Date(item.updatedAt || item.createdAt).toLocaleDateString()}</p>
+                    <div key={item._id} className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-gray-50 rounded-xl">
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        <Avatar name={item.applicant?.name || 'Recipient'} size="sm" />
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-semibold text-gray-800 truncate">{item.applicant?.name || item.description}</p>
+                          <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                          <p className="text-[11px] text-gray-400">{new Date(item.updatedAt || item.createdAt).toLocaleDateString()}</p>
+                        </div>
                       </div>
-                      {item.requestedAmount && (
-                        <p className="text-sm font-bold text-emerald-700">₹{item.requestedAmount.toLocaleString()}</p>
-                      )}
-                      <Badge variant="emerald" size="sm">{item.status}</Badge>
+                      <div className="flex items-center justify-between sm:justify-end gap-2.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200/60">
+                        {item.requestedAmount && (
+                          <p className="text-sm font-bold text-emerald-700 font-mono">₹{item.requestedAmount.toLocaleString()}</p>
+                        )}
+                        <Badge variant="emerald" size="sm">{item.status}</Badge>
+                      </div>
                     </div>
                   ))
                 )}

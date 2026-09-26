@@ -156,14 +156,14 @@ const MadrasaFeesPage: React.FC = () => {
       />
 
       {/* Madrasa Selector & Month Filter */}
-      <div className="bg-white p-4 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs">
-          <span className="font-bold text-gray-500 uppercase mr-1">Madrasa:</span>
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-gray-200 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 shadow-sm">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 text-xs scrollbar-none">
+          <span className="font-bold text-gray-500 uppercase mr-1 shrink-0">Madrasa:</span>
           {madrasas.map((m: any) => (
             <button
               key={m._id}
               onClick={() => setSelectedMadrasaId(m._id)}
-              className={`px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap flex items-center gap-2 ${
+              className={`px-3.5 py-1.5 rounded-xl font-bold transition-all whitespace-nowrap flex items-center gap-2 shrink-0 ${
                 activeMadrasaId === m._id
                   ? 'bg-emerald-600 text-white shadow-sm'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -175,13 +175,13 @@ const MadrasaFeesPage: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap w-full md:w-auto">
           <div className="flex items-center gap-1.5 text-xs">
-            <span className="font-semibold text-gray-500">Month:</span>
+            <span className="font-semibold text-gray-500 shrink-0">Month:</span>
             <select
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="text-xs rounded-xl border border-gray-200 p-1.5 font-bold outline-none focus:border-emerald-500"
+              className="text-xs rounded-xl border border-gray-200 p-1.5 font-bold outline-none focus:border-emerald-500 bg-white"
             >
               <option value="2026-09">September 2026</option>
               <option value="2026-08">August 2026</option>
@@ -190,7 +190,7 @@ const MadrasaFeesPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="relative min-w-[200px]">
+          <div className="relative flex-1 sm:w-52">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
