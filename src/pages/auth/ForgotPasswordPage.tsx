@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, CheckCircle2, ArrowLeft, KeyRound, ShieldCheck, RefreshCw } from 'lucide-react';
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeft,
+  KeyRound,
+  ShieldCheck,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react';
 import { authApi } from '../../api/authApi';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 
-type Step = 'EMAIL' | 'OTP' | 'SUCCESS';
+type Step = 'EMAIL' | 'OTP' | 'RESET' | 'SUCCESS';
 
 const ForgotPasswordPage: React.FC = () => {
   const navigate = useNavigate();
@@ -17,7 +29,9 @@ const ForgotPasswordPage: React.FC = () => {
 
   const [step, setStep] = useState<Step>('EMAIL');
   const [email, setEmail] = useState(initialEmail);
-  const [otp, setOtp] = useState('');
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
+  const [devOtp, setDevOtp] = useState<string | null>(null);
+
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -28,7 +42,17 @@ const ForgotPasswordPage: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState('');
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  const [devOtp, setDevOtp] = useState<string | null>(null);
+  // Refs for the 6 modern mini-boxes
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Auto-focus first mini-box when entering OTP step
+  useEffect(() => {
+    if (step === 'OTP') {
+      setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 150);
+    }
+  }, [step]);
 
   // Countdown timer for resend OTP
   useEffect(() => {
@@ -39,7 +63,7 @@ const ForgotPasswordPage: React.FC = () => {
     return () => clearTimeout(timer);
   }, [resendCooldown]);
 
-  // Step 1: Request OTP / Verify Email
+  // ─── STEP 1: REQUEST OTP / VERIFY EMAIL ──────────────────────────────────
   const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
@@ -58,7 +82,9 @@ const ForgotPasswordPage: React.FC = () => {
         'A 6-digit verification code has been sent to your email.';
       setSuccessMsg(msg);
       if (res?.data?.devOtp || res?.devOtp) {
-        setDevOtp(res?.data?.devOtp || res?.devOtp);
+        const foundOtp = res?.data?.devOtp || res?.devOtp;
+        setDevOtp(foundOtp);
+        handleAutoFillOtp(foundOtp);
       }
       setStep('OTP');
       setResendCooldown(60);
@@ -67,14 +93,14 @@ const ForgotPasswordPage: React.FC = () => {
         err.response?.data?.error?.message ||
         err.response?.data?.message ||
         err.message ||
-        'Failed to verify email. Please check your registered email or contact admin.';
+        'Failed to verify email. Please check that this email is registered.';
       setError(msg);
     } finally {
       setLoading(false);
     }
   };
 
-  // Step 2: Resend OTP
+  // ─── STEP 2: RESEND OTP ──────────────────────────────────────────────────
   const handleResendOtp = async () => {
     if (resendCooldown > 0 || loading) return;
     setError('');
@@ -88,7 +114,9 @@ const ForgotPasswordPage: React.FC = () => {
         'A fresh 6-digit verification code has been sent.';
       setSuccessMsg(msg);
       if (res?.data?.devOtp || res?.devOtp) {
-        setDevOtp(res?.data?.devOtp || res?.devOtp);
+        const foundOtp = res?.data?.devOtp || res?.devOtp;
+        setDevOtp(foundOtp);
+        handleAutoFillOtp(foundOtp);
       }
       setResendCooldown(60);
     } catch (err: any) {
@@ -103,15 +131,98 @@ const ForgotPasswordPage: React.FC = () => {
     }
   };
 
-  // Step 3: Verify OTP & Reset Password
-  const handleResetPassword = async (e: React.FormEvent) => {
+  // ─── 6 MINI-BOXES OTP HANDLERS ───────────────────────────────────────────
+  const handleDigitChange = (index: number, val: string) => {
+    const digitsOnly = val.replace(/\D/g, '');
+
+    // Multi-digit paste or autofill
+    if (digitsOnly.length > 1) {
+      handleAutoFillOtp(digitsOnly);
+      return;
+    }
+
+    const singleDigit = digitsOnly.slice(-1);
+    const newDigits = [...otpDigits];
+    newDigits[index] = singleDigit;
+    setOtpDigits(newDigits);
+
+    // If user typed a digit, advance focus to next box
+    if (singleDigit && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      if (otpDigits[index] === '' && index > 0) {
+        const newDigits = [...otpDigits];
+        newDigits[index - 1] = '';
+        setOtpDigits(newDigits);
+        inputRefs.current[index - 1]?.focus();
+      } else {
+        const newDigits = [...otpDigits];
+        newDigits[index] = '';
+        setOtpDigits(newDigits);
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleDigitPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!pasted) return;
+    handleAutoFillOtp(pasted);
+  };
+
+  const handleAutoFillOtp = (code: string) => {
+    const clean = code.replace(/\D/g, '').slice(0, 6);
+    const newDigits = clean.split('');
+    while (newDigits.length < 6) newDigits.push('');
+    setOtpDigits(newDigits);
+    const focusIndex = Math.min(clean.length, 5);
+    setTimeout(() => {
+      inputRefs.current[focusIndex]?.focus();
+    }, 50);
+  };
+
+  // ─── STEP 2: VERIFY OTP CODE (ADVANCE TO RESET PASSWORD) ─────────────────
+  const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (otp.trim().length !== 6) {
-      setError('Please enter the complete 6-digit OTP code.');
+    const otpCode = otpDigits.join('');
+    if (otpCode.length !== 6) {
+      setError('Please enter all 6 digits of your verification code.');
       return;
     }
+
+    setLoading(true);
+
+    try {
+      const res: any = await authApi.verifyResetOtp(email.trim(), otpCode);
+      const msg = res?.data?.message || res?.message || 'Verification code confirmed!';
+      setSuccessMsg(msg);
+      setStep('RESET');
+    } catch (err: any) {
+      const msg =
+        err.response?.data?.error?.message ||
+        err.response?.data?.message ||
+        err.message ||
+        'Invalid or expired verification code. Please check and try again.';
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── STEP 3: RESET PASSWORD ──────────────────────────────────────────────
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
     if (newPassword.length < 6) {
       setError('New password must be at least 6 characters long.');
@@ -126,7 +237,8 @@ const ForgotPasswordPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await authApi.resetPassword(email.trim(), otp.trim(), newPassword);
+      const otpCode = otpDigits.join('');
+      await authApi.resetPassword(email.trim(), otpCode, newPassword);
       setStep('SUCCESS');
       // Redirect to login after 2.5 seconds
       setTimeout(() => {
@@ -139,12 +251,14 @@ const ForgotPasswordPage: React.FC = () => {
         err.response?.data?.error?.message ||
         err.response?.data?.message ||
         err.message ||
-        'Invalid or expired OTP code. Please check and try again.';
+        'Failed to reset password. Please try requesting a new OTP.';
       setError(msg);
     } finally {
       setLoading(false);
     }
   };
+
+  const isOtpComplete = otpDigits.every((d) => d !== '') && otpDigits.length === 6;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex">
@@ -214,7 +328,7 @@ const ForgotPasswordPage: React.FC = () => {
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">Forgot Password?</h2>
                 <p className="text-gray-500 text-sm">
-                  Enter your account email to receive a 6-digit OTP verification code.
+                  Enter your registered account email to receive a 6-digit verification code.
                 </p>
               </div>
 
@@ -235,7 +349,7 @@ const ForgotPasswordPage: React.FC = () => {
                   icon={<Mail size={16} />}
                   required
                   autoFocus
-                  helper="We will dispatch a 6-digit OTP code to this inbox."
+                  helper="We will dispatch a 6-digit verification code directly to this inbox."
                 />
 
                 <Button
@@ -243,7 +357,7 @@ const ForgotPasswordPage: React.FC = () => {
                   loading={loading}
                   fullWidth
                   size="lg"
-                  className="mt-2"
+                  className="mt-2 cursor-pointer"
                   icon={<ShieldCheck size={18} />}
                 >
                   Verify Email &amp; Send OTP
@@ -252,7 +366,7 @@ const ForgotPasswordPage: React.FC = () => {
             </div>
           )}
 
-          {/* ─── STEP 2: ENTER OTP & NEW PASSWORD ─────────────────────────────── */}
+          {/* ─── STEP 2: 6 MINI-BOXES OTP VERIFICATION ────────────────────────── */}
           {step === 'OTP' && (
             <div>
               <div className="mb-6">
@@ -292,16 +406,18 @@ const ForgotPasswordPage: React.FC = () => {
                 </div>
               )}
 
-              <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
+              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-5">
                 {devOtp && (
-                  <div className="flex items-center justify-between p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
-                    <div>
-                      <span className="font-semibold">Quick verification code: </span>
-                      <strong className="font-mono text-sm tracking-wider text-emerald-950 ml-1">{devOtp}</strong>
+                  <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl text-xs text-emerald-800">
+                    <div className="flex items-center gap-2">
+                      <Sparkles size={15} className="text-emerald-600 shrink-0" />
+                      <span>
+                        Quick verification code: <strong className="font-mono text-sm tracking-wider text-emerald-950 ml-1">{devOtp}</strong>
+                      </span>
                     </div>
                     <button
                       type="button"
-                      onClick={() => setOtp(devOtp)}
+                      onClick={() => handleAutoFillOtp(devOtp)}
                       className="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-semibold hover:bg-emerald-700 cursor-pointer transition-colors shadow-xs"
                     >
                       Auto-fill
@@ -309,24 +425,35 @@ const ForgotPasswordPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* 6-Digit OTP Input */}
+                {/* 6 Modern Mini-Boxes */}
                 <div>
-                  <label className="text-sm font-medium text-gray-700 block mb-1.5">
-                    6-Digit OTP Code <span className="text-red-500">*</span>
+                  <label className="text-sm font-medium text-gray-700 block mb-2 text-center">
+                    Enter the 6-digit OTP code below
                   </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      maxLength={6}
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                      placeholder="• • • • • •"
-                      className="w-full text-center text-2xl font-bold tracking-[0.5em] font-mono py-3 px-4 rounded-xl border border-gray-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 outline-none transition-all bg-white"
-                      required
-                      autoFocus
-                    />
+                  <div className="flex items-center justify-between gap-2 sm:gap-3 py-1">
+                    {otpDigits.map((digit, idx) => (
+                      <input
+                        key={idx}
+                        ref={(el) => {
+                          inputRefs.current[idx] = el;
+                        }}
+                        type="text"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={idx === 0 ? 6 : 1}
+                        value={digit}
+                        onChange={(e) => handleDigitChange(idx, e.target.value)}
+                        onKeyDown={(e) => handleDigitKeyDown(idx, e)}
+                        onPaste={handleDigitPaste}
+                        className={`w-11 h-14 sm:w-13 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border-2 transition-all outline-none cursor-pointer ${
+                          digit
+                            ? 'border-emerald-600 bg-emerald-50/50 text-emerald-950 ring-2 ring-emerald-100 shadow-xs'
+                            : 'border-gray-200 bg-white text-gray-800 hover:border-gray-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100'
+                        }`}
+                      />
+                    ))}
                   </div>
-                  <div className="flex items-center justify-between mt-2 text-xs">
+                  <div className="flex items-center justify-between mt-3 text-xs">
                     <span className="text-gray-400">Check inbox &amp; spam folder (valid for 10 min)</span>
                     <button
                       type="button"
@@ -344,6 +471,56 @@ const ForgotPasswordPage: React.FC = () => {
                   </div>
                 </div>
 
+                <Button
+                  type="submit"
+                  loading={loading}
+                  disabled={!isOtpComplete || loading}
+                  fullWidth
+                  size="lg"
+                  className="mt-2 cursor-pointer disabled:opacity-50"
+                  icon={<ShieldCheck size={18} />}
+                >
+                  Verify Code &amp; Continue
+                </Button>
+              </form>
+            </div>
+          )}
+
+          {/* ─── STEP 3: SET NEW PASSWORD ────────────────────────────────────── */}
+          {step === 'RESET' && (
+            <div>
+              <div className="mb-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setStep('OTP');
+                    setError('');
+                  }}
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-gray-500 hover:text-emerald-600 mb-4 transition-colors cursor-pointer"
+                >
+                  <ArrowLeft size={14} /> Back to Code
+                </button>
+                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
+                  <Lock size={24} />
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Set New Password</h2>
+                <div className="flex items-center gap-2 text-sm text-gray-600 mt-1">
+                  <CheckCircle2 size={16} className="text-emerald-600 shrink-0" />
+                  <span>Code verified for:</span>
+                  <span className="font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 text-xs">
+                    {email}
+                  </span>
+                </div>
+              </div>
+
+              {error && (
+                <div className="flex items-center gap-2 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-700 text-sm mb-4">
+                  <AlertCircle size={16} className="shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
+              <form onSubmit={handleResetPassword} className="flex flex-col gap-4">
                 {/* New Password */}
                 <Input
                   label="New Password"
@@ -353,11 +530,12 @@ const ForgotPasswordPage: React.FC = () => {
                   placeholder="At least 6 characters"
                   icon={<Lock size={16} />}
                   iconRight={
-                    <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="cursor-pointer">
                       {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   }
                   required
+                  autoFocus
                 />
 
                 {/* Confirm New Password */}
@@ -369,7 +547,7 @@ const ForgotPasswordPage: React.FC = () => {
                   placeholder="Re-enter your new password"
                   icon={<Lock size={16} />}
                   iconRight={
-                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="cursor-pointer">
                       {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                     </button>
                   }
@@ -381,23 +559,23 @@ const ForgotPasswordPage: React.FC = () => {
                   loading={loading}
                   fullWidth
                   size="lg"
-                  className="mt-2"
+                  className="mt-2 cursor-pointer"
                   icon={<CheckCircle2 size={18} />}
                 >
-                  Verify OTP &amp; Reset Password
+                  Reset Password &amp; Sign In
                 </Button>
               </form>
             </div>
           )}
 
-          {/* ─── STEP 3: SUCCESS CONFIRMATION ─────────────────────────────────── */}
+          {/* ─── STEP 4: SUCCESS CONFIRMATION ─────────────────────────────────── */}
           {step === 'SUCCESS' && (
             <div className="text-center py-6">
               <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 animate-bounce">
                 <CheckCircle2 size={32} />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Password Reset Successful!</h2>
-              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto leading-relaxed">
                 Your password has been successfully updated. Redirecting you to sign in with your new credentials...
               </p>
 
@@ -405,6 +583,7 @@ const ForgotPasswordPage: React.FC = () => {
                 onClick={() => navigate('/login', { state: { email, resetSuccess: true } })}
                 fullWidth
                 size="lg"
+                className="cursor-pointer"
               >
                 Proceed to Sign In Now
               </Button>
