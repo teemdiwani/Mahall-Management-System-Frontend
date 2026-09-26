@@ -27,36 +27,57 @@ const WelfareCasesPage: React.FC = () => {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ type: 'WELFARE', description: '', requestedAmount: '', applicantName: '', applicantPhone: '' });
 
-  const { data, isLoading } = useQuery({
+  const [formError, setFormError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
+  const { data, isLoading, isError, error } = useQuery({
     queryKey: ['welfare-cases', statusFilter, typeFilter],
     queryFn: () => welfareApi.listCases({ status: statusFilter || undefined, type: typeFilter || undefined }),
   });
 
   const updateStatus = useMutation({
     mutationFn: ({ id, status, note }: any) => welfareApi.updateCaseStatus(id, status, note),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['welfare-cases'] }); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['welfare-cases'] });
+      setSuccessMsg('Welfare case status updated successfully.');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    },
+    onError: (err: any) => {
+      setFormError(err?.response?.data?.message || err?.message || 'Failed to update case status');
+    },
   });
 
   const createCase = useMutation({
     mutationFn: (d: any) => welfareApi.createCase(d),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['welfare-cases'] }); setShowCreate(false); setForm({ type: 'WELFARE', description: '', requestedAmount: '', applicantName: '', applicantPhone: '' }); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['welfare-cases'] });
+      setShowCreate(false);
+      setForm({ type: 'WELFARE', description: '', requestedAmount: '', applicantName: '', applicantPhone: '' });
+      setSuccessMsg('New welfare assistance case registered successfully.');
+      setTimeout(() => setSuccessMsg(null), 4000);
+    },
+    onError: (err: any) => {
+      setFormError(err?.response?.data?.message || err?.message || 'Failed to register case');
+    },
   });
 
-  const cases = (data?.data?.items || data?.data || []) as any[];
+  const cases = (Array.isArray(data?.data?.items) ? data.data.items : Array.isArray(data?.data) ? data.data : []) as any[];
   const filtered = cases.filter((c: any) =>
-    !search || c.description?.toLowerCase().includes(search.toLowerCase()) ||
-    c.applicant?.name?.toLowerCase().includes(search.toLowerCase())
+    !search ||
+    c.description?.toLowerCase().includes(search.toLowerCase()) ||
+    c.applicant?.name?.toLowerCase().includes(search.toLowerCase()) ||
+    c.applicantName?.toLowerCase().includes(search.toLowerCase())
   );
 
   const stats = [
-    { label: 'Pending', value: String(cases.filter((c: any) => c.status === 'PENDING').length), icon: <Clock size={18} />, bg: 'bg-amber-50 text-amber-600' },
-    { label: 'Under Review', value: String(cases.filter((c: any) => c.status === 'UNDER_REVIEW').length), icon: <FileText size={18} />, bg: 'bg-blue-50 text-blue-600' },
-    { label: 'Approved', value: String(cases.filter((c: any) => c.status === 'APPROVED').length), icon: <CheckCircle2 size={18} />, bg: 'bg-emerald-50 text-emerald-600' },
+    { label: 'Pending', value: String(cases.filter((c: any) => (c.status || '').toUpperCase() === 'PENDING').length), icon: <Clock size={18} />, bg: 'bg-amber-50 text-amber-600' },
+    { label: 'Under Review', value: String(cases.filter((c: any) => (c.status || '').toUpperCase() === 'UNDER_REVIEW').length), icon: <FileText size={18} />, bg: 'bg-blue-50 text-blue-600' },
+    { label: 'Approved', value: String(cases.filter((c: any) => (c.status || '').toUpperCase() === 'APPROVED').length), icon: <CheckCircle2 size={18} />, bg: 'bg-emerald-50 text-emerald-600' },
     { label: 'Total Cases', value: String(cases.length), icon: <Heart size={18} />, bg: 'bg-purple-50 text-purple-600' },
   ];
 
   return (
-    <div>
+    <div className="space-y-6">
       <PageHeader
         title="Welfare Cases"
         subtitle="Manage assistance applications — welfare, zakat, medical, scholarship"
@@ -64,7 +85,33 @@ const WelfareCasesPage: React.FC = () => {
         action={<Button icon={<Plus size={16} />} onClick={() => setShowCreate(true)}>New Case</Button>}
       />
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      {/* Success Banner */}
+      {successMsg && (
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 flex items-center justify-between gap-3 animate-fade-in shadow-sm">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={18} className="text-emerald-600 flex-shrink-0" />
+            <p className="text-sm font-semibold">{successMsg}</p>
+          </div>
+          <button onClick={() => setSuccessMsg(null)} className="text-xs font-bold text-emerald-700 hover:underline">
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* Error Banner */}
+      {formError && (
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-800 flex items-center justify-between gap-3 animate-fade-in shadow-sm">
+          <div className="flex items-center gap-2">
+            <XCircle size={18} className="text-red-600 flex-shrink-0" />
+            <p className="text-sm font-semibold">{formError}</p>
+          </div>
+          <button onClick={() => setFormError(null)} className="text-xs font-bold text-red-700 hover:underline">
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map(s => (
           <StatCard key={s.label} label={s.label} value={s.value} icon={s.icon} iconBg={s.bg} />
         ))}
@@ -93,30 +140,36 @@ const WelfareCasesPage: React.FC = () => {
 
         {isLoading ? (
           <div className="py-16 flex justify-center"><Loader2 className="animate-spin text-emerald-600" size={28} /></div>
+        ) : isError ? (
+          <div className="py-16 text-center text-red-500">
+            <XCircle size={36} className="mx-auto mb-2 opacity-50" />
+            <p className="text-sm font-semibold">Failed to load welfare cases</p>
+            <p className="text-xs text-gray-400 mt-1">{(error as any)?.message || 'Please verify your permissions or network connection.'}</p>
+          </div>
         ) : filtered.length === 0 ? (
           <div className="py-16 text-center text-gray-400"><Heart size={40} className="mx-auto mb-3 opacity-30" /><p>No welfare cases found</p></div>
         ) : (
           <div className="divide-y divide-gray-50">
             {filtered.map((c: any) => (
               <div key={c._id} className="flex items-start gap-4 p-4 hover:bg-gray-50 transition-colors">
-                <Avatar name={c.applicant?.name || c.description?.slice(0, 8) || 'W'} size="sm" />
+                <Avatar name={c.applicant?.name || c.applicantName || c.description?.slice(0, 8) || 'W'} size="sm" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="font-semibold text-sm text-gray-800">{c.applicant?.name || 'Applicant'}</p>
+                    <p className="font-semibold text-sm text-gray-800">{c.applicant?.name || c.applicantName || 'Applicant'}</p>
                     <Badge variant="blue" size="sm">{CASE_TYPES.find(t => t.value === c.type)?.label || c.type}</Badge>
                     <ApplicationStatusBadge status={c.status} />
                   </div>
                   <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{c.description}</p>
-                  {c.requestedAmount && <p className="text-xs font-semibold text-emerald-700 mt-1">Amount Requested: ₹{c.requestedAmount.toLocaleString()}</p>}
-                  <p className="text-xs text-gray-400 mt-1">{new Date(c.createdAt).toLocaleDateString()}</p>
+                  {c.requestedAmount && <p className="text-xs font-semibold text-emerald-700 mt-1">Amount Requested: ₹{Number(c.requestedAmount).toLocaleString()}</p>}
+                  <p className="text-xs text-gray-400 mt-1">{c.createdAt ? new Date(c.createdAt).toLocaleDateString() : '—'}</p>
                 </div>
                 <div className="flex gap-2 flex-shrink-0">
-                  {c.status === 'PENDING' && (
+                  {(c.status || '').toUpperCase() === 'PENDING' && (
                     <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ id: c._id, status: 'UNDER_REVIEW' })}>
                       Review
                     </Button>
                   )}
-                  {c.status === 'UNDER_REVIEW' && (
+                  {(c.status || '').toUpperCase() === 'UNDER_REVIEW' && (
                     <>
                       <Button size="sm" onClick={() => updateStatus.mutate({ id: c._id, status: 'APPROVED' })}>Approve</Button>
                       <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ id: c._id, status: 'REJECTED' })}>
@@ -124,7 +177,7 @@ const WelfareCasesPage: React.FC = () => {
                       </Button>
                     </>
                   )}
-                  {c.status === 'APPROVED' && (
+                  {(c.status || '').toUpperCase() === 'APPROVED' && (
                     <Button size="sm" variant="outline" onClick={() => updateStatus.mutate({ id: c._id, status: 'COMPLETED' })}>
                       Complete
                     </Button>

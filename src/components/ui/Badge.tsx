@@ -45,36 +45,55 @@ const Badge: React.FC<BadgeProps> = ({ children, variant = 'gray', size = 'sm', 
 };
 
 // Status-aware badges
-export const ApplicationStatusBadge: React.FC<{ status: ApplicationStatus }> = ({ status }) => {
-  const config: Record<ApplicationStatus, { label: string; variant: BadgeVariant }> = {
+export const ApplicationStatusBadge: React.FC<{ status?: string | ApplicationStatus }> = ({ status }) => {
+  const normalized = (status || 'pending').toString().toLowerCase().replace(/[\s-]+/g, '_');
+  const config: Record<string, { label: string; variant: BadgeVariant }> = {
     pending: { label: 'Pending', variant: 'amber' },
     under_review: { label: 'Under Review', variant: 'blue' },
+    in_review: { label: 'In Review', variant: 'blue' },
+    reviewing: { label: 'Reviewing', variant: 'blue' },
     approved: { label: 'Approved', variant: 'emerald' },
     rejected: { label: 'Rejected', variant: 'red' },
     completed: { label: 'Completed', variant: 'teal' },
   };
-  const { label, variant } = config[status];
-  return <Badge variant={variant} dot>{label}</Badge>;
+  const item = config[normalized] || {
+    label: (status || 'Pending').toString().replace(/_/g, ' '),
+    variant: 'gray' as BadgeVariant,
+  };
+  return <Badge variant={item.variant} dot>{item.label}</Badge>;
 };
 
-export const PaymentStatusBadge: React.FC<{ status: PaymentStatus }> = ({ status }) => {
-  const config: Record<PaymentStatus, { label: string; variant: BadgeVariant }> = {
+export const PaymentStatusBadge: React.FC<{ status?: string | PaymentStatus }> = ({ status }) => {
+  const normalized = (status || 'pending').toString().toLowerCase().replace(/[\s-]+/g, '_');
+  const config: Record<string, { label: string; variant: BadgeVariant }> = {
     paid: { label: 'Paid', variant: 'emerald' },
     pending: { label: 'Pending', variant: 'amber' },
     overdue: { label: 'Overdue', variant: 'red' },
+    failed: { label: 'Failed', variant: 'red' },
+    processing: { label: 'Processing', variant: 'blue' },
+    refunded: { label: 'Refunded', variant: 'gray' },
   };
-  const { label, variant } = config[status];
-  return <Badge variant={variant} dot>{label}</Badge>;
+  const item = config[normalized] || {
+    label: (status || 'Pending').toString().replace(/_/g, ' '),
+    variant: 'gray' as BadgeVariant,
+  };
+  return <Badge variant={item.variant} dot>{item.label}</Badge>;
 };
 
-export const AccountStatusBadge: React.FC<{ status: AccountStatus }> = ({ status }) => {
-  const config: Record<AccountStatus, { label: string; variant: BadgeVariant }> = {
+export const AccountStatusBadge: React.FC<{ status?: string | AccountStatus }> = ({ status }) => {
+  const normalized = (status || 'active').toString().toLowerCase().replace(/[\s-]+/g, '_');
+  const config: Record<string, { label: string; variant: BadgeVariant }> = {
     active: { label: 'Active', variant: 'emerald' },
     inactive: { label: 'Inactive', variant: 'gray' },
     pending: { label: 'Pending', variant: 'amber' },
+    deceased: { label: 'Deceased', variant: 'red' },
+    suspended: { label: 'Suspended', variant: 'red' },
   };
-  const { label, variant } = config[status];
-  return <Badge variant={variant} dot>{label}</Badge>;
+  const item = config[normalized] || {
+    label: (status || 'Active').toString().replace(/_/g, ' '),
+    variant: 'gray' as BadgeVariant,
+  };
+  return <Badge variant={item.variant} dot>{item.label}</Badge>;
 };
 
 export default Badge;
