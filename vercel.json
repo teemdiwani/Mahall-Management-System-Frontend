@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api/mail-relay",
+      "destination": "/api/mail-relay"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://mahall-management-system-backend.onrender.com/api/:path*"
     },
