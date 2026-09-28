@@ -16,9 +16,12 @@ import {
   FileText,
   AlertTriangle,
   Send,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { usePushNotifications } from '../../context/PushNotificationContext';
 import { ROLE_LABELS } from '../../types';
 import Avatar from '../ui/Avatar';
@@ -51,6 +54,8 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
     markAllAsRead,
     isSupported,
   } = usePushNotifications();
+
+  const { isDark, toggleTheme } = useTheme();
 
   const { data: annRes } = useQuery({
     queryKey: ['topbar-announcements'],
@@ -145,12 +150,12 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
   const totalUnread = unreadCount > 0 ? unreadCount : displayItems.filter((i: any) => !i.read).length;
 
   return (
-    <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-20">
+    <header className="h-16 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md border-b border-gray-100 dark:border-gray-800 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-20 transition-colors duration-200">
       {/* Left */}
       <div className="flex items-center gap-2 sm:gap-4 flex-1">
         <button
           onClick={handleMenuClick}
-          className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors cursor-pointer"
+          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300 transition-colors cursor-pointer"
           aria-label="Toggle navigation menu"
         >
           <Menu size={22} />
@@ -158,29 +163,29 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
 
         {/* Desktop Search */}
         <div className="relative hidden md:block">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
           <input
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             placeholder="Search members, families, payments..."
-            className="w-64 lg:w-80 pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 outline-none transition-all"
+            className="w-64 lg:w-80 pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/90 text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:bg-white dark:focus:bg-gray-800 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-100 dark:focus:ring-emerald-950 outline-none transition-all"
           />
         </div>
 
         {/* Mobile Search Input Overlay */}
         {mobileSearchOpen && (
-          <div className="md:hidden absolute inset-x-0 top-0 h-16 bg-white z-30 px-3 flex items-center gap-2 border-b border-gray-100">
-            <Search size={18} className="text-gray-400 shrink-0" />
+          <div className="md:hidden absolute inset-x-0 top-0 h-16 bg-white dark:bg-gray-900 z-30 px-3 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800">
+            <Search size={18} className="text-gray-400 dark:text-gray-500 shrink-0" />
             <input
               autoFocus
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search..."
-              className="flex-1 py-2 text-base outline-none bg-transparent"
+              className="flex-1 py-2 text-base outline-none bg-transparent text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
             />
             <button
               onClick={() => setMobileSearchOpen(false)}
-              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 cursor-pointer"
+              className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 cursor-pointer"
             >
               <X size={20} />
             </button>
@@ -193,17 +198,27 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
         {/* Mobile Search Button */}
         <button
           onClick={() => setMobileSearchOpen(true)}
-          className="md:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors cursor-pointer"
+          className="md:hidden p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors cursor-pointer"
           aria-label="Open search"
         >
           <Search size={20} />
+        </button>
+
+        {/* Dark Mode Quick Switcher */}
+        <button
+          onClick={toggleTheme}
+          className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors cursor-pointer"
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label="Toggle theme"
+        >
+          {isDark ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} />}
         </button>
 
         {/* Notifications & Push Notification Controller */}
         <div className="relative">
           <button
             onClick={() => { setNotifOpen(!notifOpen); setUserMenuOpen(false); }}
-            className="p-2 rounded-xl hover:bg-gray-100 text-gray-500 transition-colors relative cursor-pointer"
+            className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-400 transition-colors relative cursor-pointer"
             title="Notifications & Push Alerts"
           >
             <Bell size={20} />
@@ -215,9 +230,9 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
           </button>
 
           {notifOpen && (
-            <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-12 w-[calc(100vw-24px)] max-w-sm sm:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+            <div className="fixed sm:absolute right-3 sm:right-0 top-16 sm:top-12 w-[calc(100vw-24px)] max-w-sm sm:w-96 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-100 dark:border-gray-800 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
               {/* Header */}
-              <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between bg-gray-50/50 dark:bg-gray-800/50">
                 <div className="flex items-center gap-2">
                   <p className="text-sm font-semibold text-gray-800">Notifications</p>
                   {totalUnread > 0 && (
@@ -388,20 +403,20 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
         <div className="relative">
           <button
             onClick={() => { setUserMenuOpen(!userMenuOpen); setNotifOpen(false); }}
-            className="flex items-center gap-2.5 pl-1 pr-3 py-1.5 rounded-xl hover:bg-gray-100 transition-colors"
+            className="flex items-center gap-2.5 pl-1 pr-3 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
             <Avatar name={user.name} size="sm" />
             <div className="hidden md:block text-left">
-              <p className="text-sm font-medium text-gray-800 leading-tight">{user.name.split(' ')[0]}</p>
-              <p className="text-xs text-gray-400 leading-tight">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
+              <p className="text-sm font-medium text-gray-800 dark:text-gray-100 leading-tight">{user.name.split(' ')[0]}</p>
+              <p className="text-xs text-gray-400 dark:text-gray-500 leading-tight">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
             </div>
             <ChevronDown size={14} className="text-gray-400 hidden md:block" />
           </button>
           {userMenuOpen && (
-            <div className="absolute right-0 top-12 w-56 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden z-50">
-              <div className="px-4 py-3 border-b border-gray-50">
-                <p className="text-sm font-semibold text-gray-800">{user.name}</p>
-                <p className="text-xs text-gray-400">{user.email}</p>
+            <div className="absolute right-0 top-12 w-56 bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden z-50">
+              <div className="px-4 py-3 border-b border-gray-50 dark:border-gray-800">
+                <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">{user.name}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{user.email}</p>
                 <div className="mt-2">
                   <Badge variant="emerald">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</Badge>
                 </div>
@@ -410,20 +425,20 @@ const TopBar: React.FC<TopBarProps> = ({ onToggleSidebar, onOpenMobileSidebar })
                 <Link
                   to="/app/profile"
                   onClick={() => setUserMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <User size={15} /> My Profile
                 </Link>
                 <Link
                   to="/app/settings"
                   onClick={() => setUserMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
                   <Settings size={15} /> Settings
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 >
                   <LogOut size={15} /> Sign Out
                 </button>

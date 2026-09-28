@@ -19,7 +19,7 @@ const MarriagePage: React.FC = () => {
   const [form, setForm] = useState({
     groomName: '', brideName: '', officiantedBy: 'Usthad Abdullah Faizy',
     nikahDate: new Date().toISOString().split('T')[0],
-    nikahVenue: 'Al-Noor Central Masjid',
+    nikahVenue: 'Noorul Huda Central Juma Masjid, Odamala',
   });
 
   const canManage = ['super_admin', 'secretary', 'imam'].includes((user?.role || '').toLowerCase());

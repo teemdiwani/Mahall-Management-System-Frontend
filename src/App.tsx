@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { PushNotificationProvider } from './context/PushNotificationContext';
 
 // Layouts
@@ -79,55 +80,46 @@ import VolunteersPage from './pages/dashboard/shared/VolunteersPage';
 import FuneralPage from './pages/dashboard/shared/FuneralPage';
 import MarriagePage from './pages/dashboard/shared/MarriagePage';
 
-// Profile
+// Profile & Settings
 import ProfilePage from './pages/dashboard/profile/ProfilePage';
-
-// Simple placeholder for auxiliary settings/roles
-const PlaceholderPage: React.FC<{ title: string }> = ({ title }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-    <div className="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center">
-      <span className="text-2xl">⚙️</span>
-    </div>
-    <h2 className="text-xl font-bold text-gray-800 dark:text-gray-200">{title}</h2>
-    <p className="text-sm text-gray-500">System settings and configurations are managed via the role policy matrix.</p>
-  </div>
-);
+import SettingsPage from './pages/dashboard/settings/SettingsPage';
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <PushNotificationProvider>
-          <Routes>
-            {/* Public Website */}
-            <Route path="/" element={<PublicLayout />}>
-              <Route index element={<HomePage />} />
-              <Route path="about" element={<AboutPage />} />
-              <Route path="mosque" element={<MosquePublicPage />} />
-              <Route path="madrasa" element={<MadrasaPublicPage />} />
-              <Route path="services" element={<ServicesPublicPage />} />
-              <Route path="events" element={<EventsPublicPage />} />
-              <Route path="announcements" element={<AnnouncementsPublicPage />} />
-              <Route path="contact" element={<ContactPage />} />
-            </Route>
+        <ThemeProvider>
+          <PushNotificationProvider>
+            <Routes>
+              {/* Public Website */}
+              <Route path="/" element={<PublicLayout />}>
+                <Route index element={<HomePage />} />
+                <Route path="about" element={<AboutPage />} />
+                <Route path="mosque" element={<MosquePublicPage />} />
+                <Route path="madrasa" element={<MadrasaPublicPage />} />
+                <Route path="services" element={<ServicesPublicPage />} />
+                <Route path="events" element={<EventsPublicPage />} />
+                <Route path="announcements" element={<AnnouncementsPublicPage />} />
+                <Route path="contact" element={<ContactPage />} />
+              </Route>
 
-            {/* Auth */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              {/* Auth */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            {/* Standalone Official Invoice (Non-sidebar, non-header page for print & download) */}
-            <Route path="/app/payments/:id/invoice" element={<OfficialInvoicePage />} />
-            <Route path="/payments/:id/invoice" element={<OfficialInvoicePage />} />
+              {/* Standalone Official Invoice (Non-sidebar, non-header page for print & download) */}
+              <Route path="/app/payments/:id/invoice" element={<OfficialInvoicePage />} />
+              <Route path="/payments/:id/invoice" element={<OfficialInvoicePage />} />
 
-            {/* Dashboard App */}
-            <Route path="/app" element={<DashboardLayout />}>
-              <Route index element={<Navigate to="/app/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardRouter />} />
+              {/* Dashboard App */}
+              <Route path="/app" element={<DashboardLayout />}>
+                <Route index element={<Navigate to="/app/dashboard" replace />} />
+                <Route path="dashboard" element={<DashboardRouter />} />
 
-              {/* Profile & Settings */}
-              <Route path="profile" element={<ProfilePage />} />
-              <Route path="settings" element={<PlaceholderPage title="System Settings" />} />
+                {/* Profile & Settings */}
+                <Route path="profile" element={<ProfilePage />} />
+                <Route path="settings" element={<SettingsPage />} />
 
               {/* Super Admin */}
               <Route path="users" element={<UsersPage />} />
@@ -187,7 +179,8 @@ function App() {
             {/* Catch all */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </PushNotificationProvider>
+          </PushNotificationProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );

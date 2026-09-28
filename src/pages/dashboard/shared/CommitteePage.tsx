@@ -175,7 +175,7 @@ const CommitteePage: React.FC = () => {
     <div>
       <PageHeader
         title="Committee & Executive Council"
-        subtitle="Al-Noor Mahall Committee Administration — Live Synchronized with MongoDB"
+        subtitle="Noorul Huda Mahall Odamala Committee Administration — Live Synchronized with MongoDB"
         breadcrumb={[{ label: 'Dashboard', href: '/app/dashboard' }, { label: 'Committee' }]}
         action={
           <div className="flex items-center gap-2.5">

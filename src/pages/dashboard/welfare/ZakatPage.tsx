@@ -84,7 +84,7 @@ const ZakatPage: React.FC = () => {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Central Mahallu',
+        name: 'Noorul Huda Mahall Odamala',
         description: `${payForm.zakatType === 'ZAKAT' ? 'Official Zakat al-Mal' : 'Zakat al-Fitr'} Payment`,
         order_id: orderData.orderId,
         prefill: {

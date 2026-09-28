@@ -24,7 +24,7 @@ export const AnnouncementsPublicPage: React.FC = () => {
     {
       _id: 'a2',
       title: 'Janazah Notice: Marhoom K.T. Abdul Khader Haji',
-      content: 'Inna lillahi wa inna ilayhi raji’un. K.T. Abdul Khader Haji (Age 76, House #142) passed away. Janazah prayer will be held today after Asr prayer at Al-Noor Central Masjid, followed by burial at the Mahall cemetery.',
+      content: 'Inna lillahi wa inna ilayhi raji’un. K.T. Abdul Khader Haji (Age 76, House #142) passed away. Janazah prayer will be held today after Asr prayer at Noorul Huda Central Masjid, Odamala, followed by burial at the Mahall cemetery.',
       category: 'FUNERAL',
       isUrgent: true,
       date: '2026-03-15',

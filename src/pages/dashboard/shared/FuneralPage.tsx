@@ -19,7 +19,7 @@ const FuneralPage: React.FC = () => {
   const [form, setForm] = useState({
     deceasedName: '', age: '', contactPerson: '', contactPhone: '',
     dateOfDeath: new Date().toISOString().split('T')[0],
-    janaazahTime: '', janaazahPlace: 'Al-Noor Central Masjid', cemeteryPlotNumber: '',
+    janaazahTime: '', janaazahPlace: 'Noorul Huda Central Juma Masjid, Odamala', cemeteryPlotNumber: '',
   });
 
   const canManage = ['super_admin', 'secretary', 'imam'].includes((user?.role || '').toLowerCase());

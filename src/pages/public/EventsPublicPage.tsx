@@ -20,7 +20,7 @@ export const EventsPublicPage: React.FC = () => {
       description: 'Community gathering featuring pre-Iftar spiritual discourse by guest scholar followed by collective Iftar and Taraweeh.',
       date: '2026-03-20',
       time: '05:30 PM - 09:00 PM',
-      location: 'Al-Noor Central Masjid Dining Complex',
+      location: 'Noorul Huda Central Masjid Dining Complex, Odamala',
       category: 'RELIGIOUS',
       capacity: 500,
       attendees: 320,
@@ -166,7 +166,7 @@ export const EventsPublicPage: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin size={14} className="text-emerald-600 shrink-0" />
-                    <span className="truncate">{evt.location || 'Al-Noor Central Masjid'}</span>
+                    <span className="truncate">{evt.location || 'Noorul Huda Central Masjid, Odamala'}</span>
                   </div>
                   {evt.capacity && (
                     <div className="flex items-center gap-2">

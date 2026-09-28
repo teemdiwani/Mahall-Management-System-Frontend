@@ -83,7 +83,7 @@ export const MyPaymentsPage: React.FC = () => {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Mahallu Committee',
+        name: 'Noorul Huda Mahall Committee, Odamala',
         description: `Contribution for ${payment.month || payment.type} (Ref: ${payment.paymentNumber})`,
         image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=128&q=80',
         order_id: orderData.orderId,

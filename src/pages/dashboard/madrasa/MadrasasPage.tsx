@@ -280,7 +280,7 @@ const MadrasasPage: React.FC = () => {
             <input
               value={form.name}
               onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-              placeholder="e.g. Al-Noor Central Madrasa"
+              placeholder="e.g. Noorul Huda Central Madrasa, Odamala"
               className="w-full text-sm rounded-xl border border-gray-200 px-3.5 py-2.5 outline-none focus:border-emerald-500"
             />
           </div>

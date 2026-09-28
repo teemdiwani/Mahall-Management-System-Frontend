@@ -11,6 +11,7 @@ import Input, { Textarea } from '../../../components/ui/Input';
 import Select from '../../../components/ui/Select';
 import { eventsApi } from '../../../api/domainApis';
 import { useAuth } from '../../../context/AuthContext';
+import { usePushNotification } from '../../../context/PushNotificationContext';
 
 const categoryColors: Record<string, 'emerald' | 'blue' | 'purple' | 'amber' | 'teal' | 'orange' | 'gray' | 'red'> = {
   religious: 'emerald', RELIGIOUS: 'emerald',
@@ -33,12 +34,12 @@ const EventCard: React.FC<{ event: any; onRegister: (id: string) => void; isRegi
   const dateObj = new Date(dateStr);
   const registeredCount = event.registeredAttendees?.length || event.registeredCount || 0;
   const maxCapacity = event.capacity || event.maxParticipants;
-  const location = event.location || event.venue || 'Mahall Center';
+  const location = event.location || event.venue || 'Noorul Huda Community Center, Odamala';
   const category = (event.category || 'COMMUNITY').toLowerCase();
 
   return (
-    <Card hover padding="none" className="overflow-hidden">
-      <div className={`h-2 w-full ${status === 'upcoming' ? 'bg-emerald-500' : status === 'completed' ? 'bg-gray-300' : 'bg-amber-400'}`} />
+    <Card hover padding="none" className="overflow-hidden dark:bg-neutral-800/80 dark:border-neutral-700/80">
+      <div className={`h-2 w-full ${status === 'upcoming' ? 'bg-emerald-500' : status === 'completed' ? 'bg-gray-300 dark:bg-neutral-600' : 'bg-amber-400'}`} />
       <div className="p-5">
         <div className="flex items-start justify-between gap-3 mb-3">
           <div>
@@ -46,15 +47,15 @@ const EventCard: React.FC<{ event: any; onRegister: (id: string) => void; isRegi
               <Badge variant={categoryColors[category] || 'blue'} size="sm">{category}</Badge>
               <Badge variant={status === 'upcoming' ? 'emerald' : status === 'completed' ? 'gray' : 'amber'} size="sm">{status}</Badge>
             </div>
-            <h3 className="text-base font-semibold text-gray-800 leading-snug">{event.title}</h3>
+            <h3 className="text-base font-semibold text-gray-800 dark:text-neutral-100 leading-snug">{event.title}</h3>
           </div>
-          <div className="bg-white border border-gray-100 rounded-xl px-3 py-2 text-center flex-shrink-0 shadow-sm">
-            <p className="text-xs text-gray-400 uppercase">{dateObj.toLocaleString('en', { month: 'short' })}</p>
-            <p className="text-xl font-bold text-gray-800">{dateObj.getDate()}</p>
+          <div className="bg-white dark:bg-neutral-900 border border-gray-100 dark:border-neutral-700 rounded-xl px-3 py-2 text-center flex-shrink-0 shadow-sm">
+            <p className="text-xs text-gray-400 dark:text-neutral-400 uppercase">{dateObj.toLocaleString('en', { month: 'short' })}</p>
+            <p className="text-xl font-bold text-gray-800 dark:text-neutral-100">{dateObj.getDate()}</p>
           </div>
         </div>
-        <p className="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-2">{event.description}</p>
-        <div className="flex flex-col gap-1.5 text-xs text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-neutral-300 leading-relaxed mb-4 line-clamp-2">{event.description}</p>
+        <div className="flex flex-col gap-1.5 text-xs text-gray-500 dark:text-neutral-400">
           <div className="flex items-center gap-2"><MapPin size={12} />{location}</div>
           <div className="flex items-center gap-2">
             <Clock size={12} />
@@ -85,6 +86,7 @@ const EventCard: React.FC<{ event: any; onRegister: (id: string) => void; isRegi
 
 const EventsPage: React.FC = () => {
   const { user } = useAuth();
+  const { notifyEvent } = usePushNotification();
   const queryClient = useQueryClient();
   const { activeTab, setActiveTab } = useTabs('all');
   const canManage = ['super_admin', 'SUPER_ADMIN', 'secretary', 'SECRETARY', 'committee_member', 'COMMITTEE_MEMBER'].includes(user?.role ?? '');
@@ -95,7 +97,7 @@ const EventsPage: React.FC = () => {
     category: 'COMMUNITY',
     startDate: '',
     endDate: '',
-    location: 'Mahall Community Center',
+    location: 'Noorul Huda Central Masjid Hall, Odamala',
     capacity: 200,
     description: '',
   });
@@ -114,15 +116,22 @@ const EventsPage: React.FC = () => {
 
   const createMutation = useMutation({
     mutationFn: (payload: any) => eventsApi.create(payload),
-    onSuccess: () => {
+    onSuccess: (res) => {
       queryClient.invalidateQueries({ queryKey: ['events'] });
+      notifyEvent({
+        title: formData.title,
+        description: formData.description,
+        startDate: formData.startDate,
+        location: formData.location,
+        id: res?.data?._id,
+      });
       setIsAddModalOpen(false);
       setFormData({
         title: '',
         category: 'COMMUNITY',
         startDate: '',
         endDate: '',
-        location: 'Mahall Community Center',
+        location: 'Noorul Huda Central Masjid Hall, Odamala',
         capacity: 200,
         description: '',
       });
@@ -255,7 +264,7 @@ const EventsPage: React.FC = () => {
 
           <Input
             label="Location / Venue"
-            placeholder="e.g. Al-Noor Central Masjid Hall"
+            placeholder="e.g. Noorul Huda Central Masjid Hall, Odamala"
             required
             value={formData.location}
             onChange={(e) => setFormData({ ...formData, location: e.target.value })}

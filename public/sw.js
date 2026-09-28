@@ -35,7 +35,7 @@ self.addEventListener('notificationclick', (event) => {
 // Handle background push messages
 self.addEventListener('push', (event) => {
   let data = {
-    title: 'Al-Noor Mahall Alert',
+    title: 'Noorul Huda Mahall Odamala Alert',
     body: 'You have a new update from MahallConnect.',
     url: '/app/dashboard',
   };

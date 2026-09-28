@@ -292,11 +292,11 @@ const ForgotPasswordPage: React.FC = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-              <span className="text-white font-bold">AN</span>
+              <span className="text-white font-bold">NH</span>
             </div>
             <div>
-              <p className="font-bold text-gray-900">Al-Noor Mahall</p>
-              <p className="text-xs text-emerald-600">MahallConnect Security</p>
+              <p className="font-bold text-gray-900">Noorul Huda Mahall</p>
+              <p className="text-xs text-emerald-600">Odamala</p>
             </div>
           </div>
 

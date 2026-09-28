@@ -11,8 +11,8 @@ export const AboutPage: React.FC = () => {
   ];
 
   const milestones = [
-    { year: '1974', title: 'Foundation Laid', desc: 'The historic foundation of Al-Noor Masjid was laid by eminent community elders.' },
-    { year: '1988', title: 'Madrasa Establishment', desc: 'Inauguration of Al-Noor Noorul Islam Madrasa providing structured Islamic curricula.' },
+    { year: '1974', title: 'Foundation Laid', desc: 'The historic foundation of Noorul Huda Juma Masjid was laid by eminent community elders.' },
+    { year: '1988', title: 'Madrasa Establishment', desc: 'Inauguration of Noorul Huda Islamic Madrasa providing structured Islamic curricula.' },
     { year: '2005', title: 'Welfare & Zakat Cell', desc: 'Formalization of centralized Zakat collection, emergency medical aid, and pension schemes.' },
     { year: '2018', title: 'Community Complex Expansion', desc: 'Addition of the community dining hall, library, and modern administrative offices.' },
     { year: '2024', title: 'Digital Mahall Platform', desc: 'Launch of the integrated digital Mahall management system with digital IDs and records.' },
@@ -54,7 +54,7 @@ export const AboutPage: React.FC = () => {
             Building a Vibrant, Caring & Connected Mahall
           </h1>
           <p className="text-lg text-emerald-100 max-w-3xl mx-auto leading-relaxed">
-            Al-Noor Mahall serves over 580 registered Muslim families in Kozhikode through spiritual nourishment,
+            Noorul Huda Mahall Odamala serves registered Muslim families in Odamala through spiritual nourishment,
             educational advancement, compassionate welfare, and modern civic infrastructure.
           </p>
         </div>

@@ -75,7 +75,7 @@ export const MosquePublicPage: React.FC = () => {
                 <Moon size={14} /> House of Allah • Central Juma Masjid
               </div>
               <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight">
-                {mosque?.name || 'Al-Noor Central Juma Masjid'}
+                {mosque?.name || 'Noorul Huda Central Juma Masjid, Odamala'}
               </h1>
               <p className="text-emerald-100 text-base sm:text-lg leading-relaxed max-w-xl">
                 The spiritual heart of our community, welcoming worshippers for five daily prayers, Jumu'ah congregations, and continuous Islamic learning.

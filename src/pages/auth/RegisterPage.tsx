@@ -55,18 +55,18 @@ const RegisterPage: React.FC = () => {
       <div className="w-full max-w-md">
         <Link to="/" className="flex items-center gap-3 mb-8">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-            <span className="text-white font-bold">AN</span>
+            <span className="text-white font-bold">NH</span>
           </div>
           <div>
-            <p className="font-bold text-gray-900">Al-Noor Mahall</p>
-            <p className="text-xs text-emerald-600">MahallConnect</p>
+            <p className="font-bold text-gray-900">Noorul Huda Mahall</p>
+            <p className="text-xs text-emerald-600">Odamala</p>
           </div>
         </Link>
 
         <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-1">Create Account</h2>
           <p className="text-gray-500 text-sm mb-6">
-            Join Al-Noor Mahall community. New members receive the <strong>Member</strong> role by default.
+            Join Noorul Huda Mahall Odamala community. New members receive the <strong>Member</strong> role by default.
           </p>
 
           {error && (

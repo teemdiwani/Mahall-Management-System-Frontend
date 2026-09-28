@@ -28,7 +28,7 @@ const DONATION_CAUSES = [
   {
     type: 'DONATION',
     title: 'Mahall Welfare Fund',
-    desc: 'Emergency medical aid, widow assistance, and impoverished family relief within Al-Noor Mahall.',
+    desc: 'Emergency medical aid, widow assistance, and impoverished family relief within Noorul Huda Mahall Odamala.',
     icon: Heart,
     color: 'from-rose-500 to-rose-600',
     border: 'border-rose-200',
@@ -150,7 +150,7 @@ const WelfareDonationPage: React.FC = () => {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Mahallu Welfare Committee',
+        name: 'Noorul Huda Mahall Welfare Committee, Odamala',
         description: `${selectedCause} Donation — ₹${effectiveAmount}`,
         image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=128&q=80',
         order_id: orderData.orderId,
@@ -502,7 +502,7 @@ const WelfareDonationPage: React.FC = () => {
               <span>Direct Bank Transparency</span>
             </div>
             <p className="text-[11px] leading-relaxed text-gray-500">
-              All welfare contributions are credited directly into Al-Noor Mahallu registered institutional accounts and
+              All welfare contributions are credited directly into Noorul Huda Mahall Odamala registered institutional accounts and
               audited regularly by the Mahall financial committee.
             </p>
           </div>

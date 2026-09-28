@@ -74,7 +74,7 @@ const HomePage: React.FC = () => {
             <div>
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 text-sm text-emerald-100 mb-6">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                {mosque?.name || 'Al-Noor Mahall'}, Kozhikode · Est. 1975
+                {mosque?.name || 'Noorul Huda Mahall Odamala'} · Est. 1975
               </div>
               <h1 className="text-5xl lg:text-6xl font-bold leading-tight mb-6">
                 Your Mahall,<br />
@@ -151,7 +151,7 @@ const HomePage: React.FC = () => {
           <p className="text-emerald-600 font-semibold text-sm uppercase tracking-wider mb-2">Our Services</p>
           <h2 className="text-3xl font-bold text-gray-900 mb-3">Everything Your Community Needs</h2>
           <p className="text-gray-500 max-w-xl mx-auto">
-            From education to welfare, finance to events — Al-Noor Mahall provides comprehensive community services.
+            From education to welfare, finance to events — Noorul Huda Mahall Odamala provides comprehensive community services.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -237,7 +237,7 @@ const HomePage: React.FC = () => {
             <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full bg-white" />
           </div>
           <div className="relative">
-            <h2 className="text-3xl font-bold mb-3">Join Al-Noor Mahall Community</h2>
+            <h2 className="text-3xl font-bold mb-3">Join Noorul Huda Mahall Odamala Community</h2>
             <p className="text-emerald-100 mb-8 max-w-lg mx-auto">Register as a member to access all services, track payments, apply for welfare, and stay connected with your community.</p>
             <div className="flex gap-4 justify-center">
               <Link to="/register" className="px-8 py-3 bg-white text-emerald-700 font-semibold rounded-xl hover:bg-emerald-50 transition-colors">

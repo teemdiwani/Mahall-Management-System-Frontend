@@ -52,7 +52,7 @@ export const MadrasaParentPortalSection: React.FC<Props> = ({ isStandalone = fal
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Madrasa Directorate',
+        name: 'Noorul Huda Madrasa Directorate, Odamala',
         description: `Madrasa Tuition Fee - ${orderData.studentName} (${fee.month})`,
         image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=128&q=80',
         order_id: orderData.orderId,

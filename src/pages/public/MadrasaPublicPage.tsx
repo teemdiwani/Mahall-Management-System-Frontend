@@ -140,7 +140,7 @@ export const MadrasaPublicPage: React.FC = () => {
       {/* Key Highlights */}
       <section className="py-16 max-w-6xl mx-auto px-4 sm:px-6">
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <span className="text-purple-600 text-xs font-bold tracking-wider uppercase">Why Choose Al-Noor</span>
+          <span className="text-purple-600 text-xs font-bold tracking-wider uppercase">Why Choose Noorul Huda</span>
           <h2 className="text-3xl font-bold text-gray-900 mt-1">Holistic Islamic Education</h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

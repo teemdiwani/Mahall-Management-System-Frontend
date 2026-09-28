@@ -86,7 +86,7 @@ const LoginPage: React.FC = () => {
               <span className="text-3xl font-bold">☽</span>
             </div>
             <h1 className="text-4xl font-bold leading-tight mb-3">
-              Al-Noor<br />MahallConnect
+              Noorul Huda<br />Mahall Odamala
             </h1>
             <p className="text-emerald-100 text-lg leading-relaxed max-w-sm">
               Your Mahall, Connected Digitally. One platform for families, services, finance, education and community.
@@ -114,11 +114,11 @@ const LoginPage: React.FC = () => {
           {/* Mobile Logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-              <span className="text-white font-bold">AN</span>
+              <span className="text-white font-bold">NH</span>
             </div>
             <div>
-              <p className="font-bold text-gray-900">Al-Noor Mahall</p>
-              <p className="text-xs text-emerald-600">MahallConnect</p>
+              <p className="font-bold text-gray-900">Noorul Huda Mahall</p>
+              <p className="text-xs text-emerald-600">Odamala</p>
             </div>
           </div>
 
@@ -205,7 +205,7 @@ const LoginPage: React.FC = () => {
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-4">
-            New to MahallConnect?{' '}
+            New to Noorul Huda Mahall Odamala?{' '}
             <Link to="/register" className="text-emerald-600 font-medium hover:underline">Create an account</Link>
           </p>
 

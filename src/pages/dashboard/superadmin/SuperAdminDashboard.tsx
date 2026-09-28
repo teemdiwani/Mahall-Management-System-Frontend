@@ -62,7 +62,7 @@ const SuperAdminDashboard: React.FC = () => {
     <div className="space-y-6">
       <PageHeader
         title="Mahall Administration"
-        subtitle="Al-Noor Mahall — Centralized Digital Administration | Live MongoDB Database"
+        subtitle="Noorul Huda Mahall Odamala — Centralized Digital Administration | Live MongoDB Database"
         breadcrumb={[{ label: 'Dashboard' }]}
         action={
           <div className="flex items-center gap-2.5 flex-wrap">

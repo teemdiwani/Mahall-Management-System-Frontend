@@ -213,7 +213,7 @@ const navItems: NavItem[] = [
     label: 'Settings',
     icon: <Settings size={18} />,
     href: '/app/settings',
-    roles: ['super_admin', 'secretary'],
+    roles: ALL_ROLES,
   },
 ];
 
@@ -321,20 +321,20 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile 
 
       {/* Sidebar Panel */}
       <aside
-        className={`fixed top-0 left-0 h-full bg-white border-r border-gray-100 flex flex-col z-50 transition-all duration-300 ease-in-out
+        className={`fixed top-0 left-0 h-full bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex flex-col z-50 transition-all duration-300 ease-in-out
           ${mobileOpen ? 'translate-x-0 w-72 shadow-2xl' : '-translate-x-full md:translate-x-0'}
           ${collapsed ? 'md:w-16' : 'md:w-64'}`}
       >
         {/* Logo & Mobile Close Header */}
-        <div className={`flex items-center justify-between px-4 h-16 border-b border-gray-100 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:justify-center' : ''}`}>
+        <div className={`flex items-center justify-between px-4 h-16 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:justify-center' : ''}`}>
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center flex-shrink-0 shadow-sm">
-              <span className="text-white text-xs font-bold">AN</span>
+              <span className="text-white text-xs font-bold">NH</span>
             </div>
             {(!collapsed || mobileOpen) && (
               <div>
-                <p className="text-sm font-bold text-gray-800 leading-tight">Al-Noor</p>
-                <p className="text-xs text-emerald-600 font-medium leading-tight">MahallConnect</p>
+                <p className="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight">Noorul Huda</p>
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium leading-tight">Mahall Odamala</p>
               </div>
             )}
           </div>
@@ -343,7 +343,7 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile 
           <button
             type="button"
             onClick={onCloseMobile}
-            className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            className="md:hidden p-1.5 rounded-lg text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             aria-label="Close navigation"
           >
             <X size={20} />
@@ -356,18 +356,18 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, mobileOpen, onCloseMobile 
         </nav>
 
         {/* User section */}
-        <div className={`border-t border-gray-100 p-3 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:flex md:justify-center' : ''}`}>
+        <div className={`border-t border-gray-100 dark:border-gray-800 p-3 flex-shrink-0 ${collapsed && !mobileOpen ? 'md:flex md:justify-center' : ''}`}>
           {(!collapsed || mobileOpen) ? (
             <div className="flex items-center gap-3">
               <Avatar name={user.name} size="sm" />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{user.name}</p>
-                <p className="text-xs text-gray-400">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{user.name}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">{ROLE_LABELS[user.role as keyof typeof ROLE_LABELS] || user.role}</p>
               </div>
               <button
                 onClick={logout}
                 title="Sign out"
-                className="text-gray-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-gray-50 cursor-pointer"
+                className="text-gray-400 hover:text-red-500 transition-colors p-1.5 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
               >
                 <LogOut size={16} />
               </button>

@@ -114,7 +114,7 @@ export const OfficialInvoiceModal: React.FC<OfficialInvoiceModalProps> = ({
             </span>
             <div>
               <h3 className="text-sm font-bold text-gray-900">Mahallu Official Invoice & Receipt</h3>
-              <p className="text-xs text-gray-500">Official verified receipt issued by Al-Noor Mahallu Committee</p>
+              <p className="text-xs text-gray-500">Official verified receipt issued by Noorul Huda Mahall Committee, Odamala</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -142,13 +142,13 @@ export const OfficialInvoiceModal: React.FC<OfficialInvoiceModalProps> = ({
               بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ
             </p>
             <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight uppercase">
-              Al-Noor Juma Masjid & Mahallu Committee
+              Noorul Huda Central Juma Masjid & Mahallu Committee, Odamala
             </h1>
             <p className="text-xs text-gray-500 font-medium">
               Registered Under State Waqf Board & Mahall Directorate Reg. No: ML-684/2012
             </p>
             <p className="text-xs text-gray-500">
-              Noor Nagar, Main Road, Calicut, Kerala - 673001 · Phone: +91 495 272 0000 · Email: finance@alnoormahall.org
+              Odamala, Malappuram, Kerala - 676505 · Phone: +91 495 272 0000 · Email: finance@noorulhudamahall.org
             </p>
           </div>
 
@@ -306,15 +306,15 @@ export const OfficialInvoiceModal: React.FC<OfficialInvoiceModalProps> = ({
                 <span className="text-[11px] font-serif italic text-gray-400">Digital Seal</span>
               </div>
               <p className="text-[11px] font-bold text-gray-700 mt-2">Treasurer / Finance Secretary</p>
-              <p className="text-[10px] text-gray-400">Al-Noor Mahall Committee</p>
+              <p className="text-[10px] text-gray-400">Noorul Huda Mahall Committee, Odamala</p>
             </div>
 
             {/* Official Green Round Seal */}
             <div className="flex flex-col items-center justify-center">
               <div className="w-20 h-20 rounded-full border-2 border-dashed border-emerald-600 flex flex-col items-center justify-center p-1 text-center bg-emerald-50/50">
-                <span className="text-[8px] font-bold text-emerald-800 uppercase tracking-tighter">AL-NOOR MAHALL</span>
+                <span className="text-[8px] font-bold text-emerald-800 uppercase tracking-tighter">NOORUL HUDA MAHALL</span>
                 <span className="text-[10px] font-black text-emerald-700">★ PAID ★</span>
-                <span className="text-[7px] text-emerald-600 font-mono">SEAL 2026</span>
+                <span className="text-[7px] text-emerald-600 font-mono">ODAMALA</span>
               </div>
               <span className="text-[9px] text-gray-400 mt-1">Official Committee Stamp</span>
             </div>
@@ -324,13 +324,13 @@ export const OfficialInvoiceModal: React.FC<OfficialInvoiceModalProps> = ({
                 <span className="text-[11px] font-serif italic text-gray-400">Authorized</span>
               </div>
               <p className="text-[11px] font-bold text-gray-700 mt-2">General Secretary</p>
-              <p className="text-[10px] text-gray-400">Al-Noor Mahall Directorate</p>
+              <p className="text-[10px] text-gray-400">Noorul Huda Mahall Committee, Odamala</p>
             </div>
           </div>
 
           {/* Footer Note */}
           <div className="mt-8 text-center text-[10px] text-gray-400 border-t border-gray-100 pt-3">
-            <p>This is a computer-generated official receipt issued by Al-Noor Mahallu Management System.</p>
+            <p>This is a computer-generated official receipt issued by Noorul Huda Mahall Odamala Management System.</p>
             <p>Jazakallahu Khair for your timely contribution towards the maintenance and welfare of our Mahallu.</p>
           </div>
         </div>

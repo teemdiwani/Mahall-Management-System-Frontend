@@ -113,7 +113,7 @@ const RamadanPage: React.FC = () => {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Central Mahallu',
+        name: 'Noorul Huda Mahall Odamala',
         description: 'Ramadan Community Iftar Sponsorship',
         order_id: orderData.orderId,
         prefill: {
@@ -177,7 +177,7 @@ const RamadanPage: React.FC = () => {
         key: orderData.keyId,
         amount: orderData.amountInPaise,
         currency: orderData.currency || 'INR',
-        name: 'Al-Noor Central Mahallu',
+        name: 'Noorul Huda Mahall Odamala',
         description: `${zakatForm.type === 'FITRAH' ? 'Zakat al-Fitr (Fitrah)' : 'Zakat al-Mal'} Payment`,
         order_id: orderData.orderId,
         prefill: {
@@ -493,7 +493,7 @@ const RamadanPage: React.FC = () => {
                 type="text"
                 value={iftarForm.donorName}
                 onChange={e => setIftarForm(p => ({ ...p, donorName: e.target.value }))}
-                placeholder="e.g. Al-Noor Family"
+                placeholder="e.g. Odamala Family"
                 className="w-full text-sm rounded-xl border border-gray-200 px-3 py-2 focus:outline-none focus:border-emerald-500"
               />
             </div>

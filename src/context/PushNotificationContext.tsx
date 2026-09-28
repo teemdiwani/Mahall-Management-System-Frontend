@@ -9,11 +9,29 @@ import {
 import { notificationsApi, announcementsApi, eventsApi, paymentsApi } from '../api/domainApis';
 import { useAuth } from './AuthContext';
 
+export interface NotificationPreferences {
+  announcements: boolean;
+  events: boolean;
+  payments: boolean;
+  sound: boolean;
+}
+
+const DEFAULT_PREFERENCES: NotificationPreferences = {
+  announcements: true,
+  events: true,
+  payments: true,
+  sound: true,
+};
+
 interface PushNotificationContextValue {
   isSupported: boolean;
   permission: NotificationPermission;
+  preferences: NotificationPreferences;
+  updatePreferences: (newPrefs: Partial<NotificationPreferences>) => void;
   requestPermission: () => Promise<boolean>;
   sendTestNotification: () => Promise<boolean>;
+  notifyAnnouncement: (ann: { title: string; content?: string; id?: string }) => Promise<boolean>;
+  notifyEvent: (ev: { title: string; description?: string; startDate?: string; location?: string; id?: string }) => Promise<boolean>;
   unreadCount: number;
   notifications: any[];
   refreshNotifications: () => Promise<void>;
@@ -22,7 +40,8 @@ interface PushNotificationContextValue {
 
 const PushNotificationContext = createContext<PushNotificationContextValue | null>(null);
 
-const STORAGE_KEY = 'mahall_notified_keys_v1';
+const STORAGE_KEYS_NOTIFIED = 'mahall_notified_keys_v1';
+const STORAGE_PREFS_KEY = 'mahall_notif_prefs_v1';
 
 export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
@@ -30,6 +49,30 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const isFirstRun = useRef(true);
+
+  const [preferences, setPreferences] = useState<NotificationPreferences>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_PREFS_KEY);
+      if (saved) {
+        return { ...DEFAULT_PREFERENCES, ...JSON.parse(saved) };
+      }
+    } catch {
+      // fallback
+    }
+    return DEFAULT_PREFERENCES;
+  });
+
+  const updatePreferences = (newPrefs: Partial<NotificationPreferences>) => {
+    setPreferences((prev) => {
+      const updated = { ...prev, ...newPrefs };
+      try {
+        localStorage.setItem(STORAGE_PREFS_KEY, JSON.stringify(updated));
+      } catch {
+        // ignore
+      }
+      return updated;
+    });
+  };
 
   // Initialize Service Worker and permissions
   useEffect(() => {
@@ -41,7 +84,7 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
 
   const getNotifiedKeys = (): Set<string> => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEYS_NOTIFIED);
       return new Set(saved ? JSON.parse(saved) : []);
     } catch {
       return new Set();
@@ -52,12 +95,40 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     try {
       const keys = getNotifiedKeys();
       keys.add(key);
-      // Keep at most 200 keys
       const arr = Array.from(keys).slice(-200);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+      localStorage.setItem(STORAGE_KEYS_NOTIFIED, JSON.stringify(arr));
     } catch {
       // ignore
     }
+  };
+
+  // Immediate notification trigger for announcements
+  const notifyAnnouncement = async (ann: { title: string; content?: string; id?: string }): Promise<boolean> => {
+    if (!preferences.announcements) return false;
+    const key = `ann-${ann.id || Date.now()}`;
+    recordNotifiedKey(key);
+    return await showBrowserPushNotification({
+      title: `📢 Announcement: ${ann.title}`,
+      body: ann.content ? ann.content.slice(0, 120) + '...' : 'Noorul Huda Mahall Odamala published a new notice.',
+      url: '/app/announcements',
+      tag: key,
+      playSound: preferences.sound,
+    });
+  };
+
+  // Immediate notification trigger for events
+  const notifyEvent = async (ev: { title: string; description?: string; startDate?: string; location?: string; id?: string }): Promise<boolean> => {
+    if (!preferences.events) return false;
+    const key = `ev-${ev.id || Date.now()}`;
+    recordNotifiedKey(key);
+    const dateStr = ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming';
+    return await showBrowserPushNotification({
+      title: `🗓️ New Event: ${ev.title}`,
+      body: `${dateStr} • ${ev.location || 'Odamala Masjid'} • ${ev.description ? ev.description.slice(0, 80) : 'Community event'}`,
+      url: '/app/events',
+      tag: key,
+      playSound: preferences.sound,
+    });
   };
 
   // Fetch in-app notifications
@@ -78,10 +149,11 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
           if (!n.read && !notifiedKeys.has(key)) {
             recordNotifiedKey(key);
             await showBrowserPushNotification({
-              title: n.title || 'Al-Noor Mahall Notification',
-              body: n.message || 'You have an important update.',
+              title: n.title || 'Noorul Huda Mahall Odamala Alert',
+              body: n.message || 'You have an important community notification.',
               url: n.link || '/app/dashboard',
               tag: `notif-${n._id}`,
+              playSound: preferences.sound,
             });
           }
         }
@@ -89,7 +161,7 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     } catch {
       // offline / not authenticated
     }
-  }, [user, permission]);
+  }, [user, permission, preferences.sound]);
 
   // Check new announcements, events, and dues
   const checkForBroadcastUpdates = useCallback(async () => {
@@ -99,60 +171,69 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
 
     try {
       // 1. Check Announcements
-      const annRes = await announcementsApi.list().catch(() => ({ data: [] }));
-      const announcements: any[] = annRes?.data || [];
+      if (preferences.announcements) {
+        const annRes = await announcementsApi.list().catch(() => ({ data: [] }));
+        const announcements: any[] = annRes?.data || [];
 
-      for (const ann of announcements.slice(0, 5)) {
-        const key = `ann-${ann._id || ann.id}`;
-        if (!notifiedKeys.has(key)) {
-          recordNotifiedKey(key);
-          if (!isFirstRun.current) {
-            await showBrowserPushNotification({
-              title: `📢 Announcement: ${ann.title}`,
-              body: ann.content ? ann.content.slice(0, 120) + '...' : 'New community notice published.',
-              url: '/app/announcements',
-              tag: key,
-            });
+        for (const ann of announcements.slice(0, 5)) {
+          const key = `ann-${ann._id || ann.id}`;
+          if (!notifiedKeys.has(key)) {
+            recordNotifiedKey(key);
+            if (!isFirstRun.current) {
+              await showBrowserPushNotification({
+                title: `📢 Announcement: ${ann.title}`,
+                body: ann.content ? ann.content.slice(0, 120) + '...' : 'New community notice from Noorul Huda Mahall Odamala.',
+                url: '/app/announcements',
+                tag: key,
+                playSound: preferences.sound,
+              });
+            }
           }
         }
       }
 
       // 2. Check Upcoming Events
-      const eventsRes = await eventsApi.list({ upcomingOnly: true }).catch(() => ({ data: [] }));
-      const events: any[] = eventsRes?.data || [];
+      if (preferences.events) {
+        const eventsRes = await eventsApi.list({ upcomingOnly: true }).catch(() => ({ data: [] }));
+        const events: any[] = eventsRes?.data || [];
 
-      for (const ev of events.slice(0, 5)) {
-        const key = `ev-${ev._id || ev.id}`;
-        if (!notifiedKeys.has(key)) {
-          recordNotifiedKey(key);
-          if (!isFirstRun.current) {
-            const evDate = ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming';
-            await showBrowserPushNotification({
-              title: `🗓️ New Event: ${ev.title}`,
-              body: `${evDate} • ${ev.description ? ev.description.slice(0, 90) : 'Al-Noor Mahall community event'}`,
-              url: '/app/events',
-              tag: key,
-            });
+        for (const ev of events.slice(0, 5)) {
+          const key = `ev-${ev._id || ev.id}`;
+          if (!notifiedKeys.has(key)) {
+            recordNotifiedKey(key);
+            if (!isFirstRun.current) {
+              const evDate = ev.startDate ? new Date(ev.startDate).toLocaleDateString() : 'Upcoming';
+              await showBrowserPushNotification({
+                title: `🗓️ New Event: ${ev.title}`,
+                body: `${evDate} • ${ev.description ? ev.description.slice(0, 90) : 'Noorul Huda Mahall Odamala event'}`,
+                url: '/app/events',
+                tag: key,
+                playSound: preferences.sound,
+              });
+            }
           }
         }
       }
 
       // 3. Check Payments & Pending Dues
-      const paymentsRes = await paymentsApi.getMyPayments().catch(() => ({ data: [] }));
-      const payments: any[] = paymentsRes?.data || [];
-      const pendingPayments = payments.filter((p) => p.status === 'PENDING');
+      if (preferences.payments) {
+        const paymentsRes = await paymentsApi.getMyPayments().catch(() => ({ data: [] }));
+        const payments: any[] = paymentsRes?.data || [];
+        const pendingPayments = payments.filter((p) => p.status === 'PENDING');
 
-      for (const pay of pendingPayments) {
-        const key = `pay-due-${pay._id || pay.id}`;
-        if (!notifiedKeys.has(key)) {
-          recordNotifiedKey(key);
-          if (!isFirstRun.current) {
-            await showBrowserPushNotification({
-              title: `💳 Monthly Dues Alert: ₹${pay.amount}`,
-              body: `Dues for ${pay.month || pay.type} are scheduled. Click to clear or view invoice.`,
-              url: '/app/my-payments',
-              tag: key,
-            });
+        for (const pay of pendingPayments) {
+          const key = `pay-due-${pay._id || pay.id}`;
+          if (!notifiedKeys.has(key)) {
+            recordNotifiedKey(key);
+            if (!isFirstRun.current) {
+              await showBrowserPushNotification({
+                title: `💳 Monthly Dues Alert: ₹${pay.amount}`,
+                body: `Dues for ${pay.month || pay.type} are scheduled. Click to clear or view invoice.`,
+                url: '/app/my-payments',
+                tag: key,
+                playSound: preferences.sound,
+              });
+            }
           }
         }
       }
@@ -163,7 +244,7 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
         isFirstRun.current = false;
       }
     }
-  }, [user, permission]);
+  }, [user, permission, preferences]);
 
   // Periodic polling
   useEffect(() => {
@@ -175,7 +256,7 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     const interval = setInterval(() => {
       refreshNotifications();
       checkForBroadcastUpdates();
-    }, 25000); // Check every 25 seconds
+    }, 20000); // Check every 20 seconds for fast updates
 
     return () => clearInterval(interval);
   }, [user, refreshNotifications, checkForBroadcastUpdates]);
@@ -186,9 +267,10 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     if (granted) {
       await showBrowserPushNotification({
         title: '🔔 Push Notifications Enabled',
-        body: 'Al-Noor Mahall will now notify you of new announcements, events, and dues directly in your browser!',
+        body: 'Noorul Huda Mahall Odamala will now notify you of new announcements, events, and dues directly in your browser!',
         url: '/app/dashboard',
         tag: 'welcome-push',
+        playSound: preferences.sound,
       });
       await checkForBroadcastUpdates();
     }
@@ -202,10 +284,11 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
     }
 
     return await showBrowserPushNotification({
-      title: '📢 MahallConnect Test Notification',
-      body: 'Browser push notifications are active! You will be notified whenever new announcements, events, or dues arrive.',
+      title: '📢 Noorul Huda Mahall Odamala Alert',
+      body: 'Browser push notifications are active! You will be notified instantly when new announcements or events are published.',
       url: '/app/announcements',
       tag: `test-${Date.now()}`,
+      playSound: preferences.sound,
     });
   };
 
@@ -224,8 +307,12 @@ export const PushNotificationProvider: React.FC<{ children: React.ReactNode }> =
       value={{
         isSupported: isPushSupported(),
         permission,
+        preferences,
+        updatePreferences,
         requestPermission,
         sendTestNotification,
+        notifyAnnouncement,
+        notifyEvent,
         unreadCount,
         notifications,
         refreshNotifications,
@@ -244,3 +331,5 @@ export const usePushNotifications = () => {
   }
   return ctx;
 };
+
+export const usePushNotification = usePushNotifications;

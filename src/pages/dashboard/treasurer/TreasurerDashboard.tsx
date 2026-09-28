@@ -46,7 +46,7 @@ const TreasurerDashboard: React.FC = () => {
     <div>
       <PageHeader
         title="Finance & Treasury Dashboard"
-        subtitle="Al-Noor Mahall — Financial Ledger & Contribution Status"
+        subtitle="Noorul Huda Mahall Odamala — Financial Ledger & Contribution Status"
         breadcrumb={[{ label: 'Dashboard' }]}
         action={
           <div className="flex items-center gap-3">

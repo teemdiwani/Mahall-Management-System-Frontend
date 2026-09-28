@@ -49,7 +49,7 @@ const MosqueDashboard: React.FC = () => {
     <div>
       <PageHeader
         title="Mosque Management"
-        subtitle={mosque?.name ? `${mosque.name} — Imam Dashboard` : 'Al-Noor Mosque — Imam Dashboard'}
+        subtitle={mosque?.name ? `${mosque.name} — Imam Dashboard` : 'Noorul Huda Central Juma Masjid, Odamala — Imam Dashboard'}
         breadcrumb={[{ label: 'Dashboard' }]}
       />
 
@@ -162,8 +162,8 @@ const MosqueDashboard: React.FC = () => {
             <div className="mt-4 flex flex-col gap-2">
               {[
                 { label: 'Phone', value: mosque?.phone || '+91 495 2345678' },
-                { label: 'Email', value: mosque?.email || 'masjid@mahallconnect.org' },
-                { label: 'Address', value: mosque?.address || 'Mosque Road, North Ward' },
+                { label: 'Email', value: mosque?.email || 'masjid@noorulhudamahall.org' },
+                { label: 'Address', value: mosque?.address || 'Odamala, Malappuram, Kerala' },
               ].map((item) => (
                 <div
                   key={item.label}

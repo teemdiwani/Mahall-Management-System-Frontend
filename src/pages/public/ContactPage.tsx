@@ -51,8 +51,8 @@ export const ContactPage: React.FC = () => {
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-800">Physical Address</h3>
                   <p className="text-sm font-medium text-gray-800 mt-0.5">
-                    Al-Noor Mahall Office & Community Centre<br />
-                    Mosque Road, North Ward, Kozhikode, Kerala 673001
+                    Noorul Huda Mahall Office & Community Centre<br />
+                    Mosque Road, Odamala, Kerala 679326
                   </p>
                 </div>
               </div>

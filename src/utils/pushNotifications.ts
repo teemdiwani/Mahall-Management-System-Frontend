@@ -77,6 +77,7 @@ export interface PushNotificationPayload {
   icon?: string;
   url?: string;
   tag?: string;
+  playSound?: boolean;
 }
 
 // Dispatch a native browser push notification
@@ -86,19 +87,22 @@ export const showBrowserPushNotification = async ({
   icon = '/favicon.svg',
   url = '/app/dashboard',
   tag,
+  playSound = true,
 }: PushNotificationPayload): Promise<boolean> => {
   if (!isPushSupported() || Notification.permission !== 'granted') {
     return false;
   }
 
-  // Play gentle notification sound
-  playNotificationChime();
+  // Play gentle notification chime if enabled
+  if (playSound) {
+    playNotificationChime();
+  }
 
   // Try via ServiceWorker registration first (handles background/mobile OS better)
   try {
     if ('serviceWorker' in navigator) {
       const reg = await navigator.serviceWorker.getRegistration();
-      if (reg && 'showNotification' in reg) {
+      if (reg && 'showNotification' in reg && reg.active) {
         await reg.showNotification(title, {
           body,
           icon,
@@ -119,9 +123,7 @@ export const showBrowserPushNotification = async ({
     const notif = new Notification(title, {
       body,
       icon,
-      badge: icon,
       tag: tag || `mahall-${Date.now()}`,
-      data: { url },
     });
 
     notif.onclick = () => {

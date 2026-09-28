@@ -24,12 +24,12 @@ const PublicLayout: React.FC = () => {
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-                <span className="text-white text-sm font-bold">AN</span>
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm">
+                <span className="text-white text-sm font-bold">NH</span>
               </div>
               <div>
-                <p className="text-sm font-bold text-gray-900 leading-tight">Al-Noor Mahall</p>
-                <p className="text-xs text-emerald-600 font-medium leading-tight">Kozhikode</p>
+                <p className="text-sm font-bold text-gray-900 leading-tight">Noorul Huda Mahall</p>
+                <p className="text-xs text-emerald-600 font-medium leading-tight">Odamala</p>
               </div>
             </Link>
 
@@ -110,16 +110,16 @@ const PublicLayout: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="col-span-1 md:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-                  <span className="text-white text-sm font-bold">AN</span>
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-sm">
+                  <span className="text-white text-sm font-bold">NH</span>
                 </div>
                 <div>
-                  <p className="text-white font-bold">Al-Noor Mahall</p>
-                  <p className="text-emerald-400 text-xs">MahallConnect Platform</p>
+                  <p className="text-white font-bold">Noorul Huda Mahall Odamala</p>
+                  <p className="text-emerald-400 text-xs">Digital Mahallu System</p>
                 </div>
               </div>
               <p className="text-sm text-gray-500 leading-relaxed max-w-xs">
-                Serving the community of Kozhikode with education, welfare, and spiritual guidance since 1975.
+                Serving the community of Odamala with education, welfare, and spiritual guidance since 1975.
               </p>
             </div>
             <div>
@@ -133,15 +133,15 @@ const PublicLayout: React.FC = () => {
             <div>
               <p className="text-white font-semibold mb-3 text-sm">Contact</p>
               <div className="flex flex-col gap-2 text-sm text-gray-500">
-                <p>Al-Noor Mosque, Meenangadi Road</p>
-                <p>Kozhikode, Kerala — 673001</p>
-                <p>+91 495 234 5678</p>
-                <p>info@alnoor.org</p>
+                <p>Noorul Huda Juma Masjid, Main Road</p>
+                <p>Odamala, Kerala — 679326</p>
+                <p>+91 493 234 5678</p>
+                <p>info@noorulhudamahal.org</p>
               </div>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-10 pt-6 text-center text-xs text-gray-600">
-            © 2026 Al-Noor Mahall. All rights reserved. Powered by MahallConnect.
+            © 2026 Noorul Huda Mahall Odamala. All rights reserved.
           </div>
         </div>
       </footer>

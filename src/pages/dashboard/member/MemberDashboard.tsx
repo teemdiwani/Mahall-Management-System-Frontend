@@ -114,7 +114,7 @@ const MemberDashboard: React.FC = () => {
           <p className="text-emerald-100 text-xs sm:text-sm mb-1">Assalamu Alaikum,</p>
           <h1 className="text-xl sm:text-2xl font-bold mb-0.5">{user?.name ?? 'Member'}</h1>
           <p className="text-emerald-100 text-xs sm:text-sm">
-            Welcome to Al-Noor Mahall · {d?.family?.familyCode ? `Family Code: ${d.family.familyCode}` : 'Member Portal'}
+            Welcome to Noorul Huda Mahall Odamala · {d?.family?.familyCode ? `Family Code: ${d.family.familyCode}` : 'Member Portal'}
           </p>
         </div>
       </div>

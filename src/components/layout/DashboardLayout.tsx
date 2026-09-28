@@ -13,13 +13,13 @@ const DashboardLayout: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center">
-            <span className="text-white text-lg font-bold">AN</span>
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg">
+            <span className="text-white text-lg font-bold">NH</span>
           </div>
           <Spinner size="md" />
-          <p className="text-sm text-gray-500">Loading MahallConnect...</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading Noorul Huda Mahall Odamala...</p>
         </div>
       </div>
     );
@@ -30,7 +30,7 @@ const DashboardLayout: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row relative">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 flex flex-col md:flex-row relative transition-colors duration-200">
       <Sidebar
         collapsed={sidebarCollapsed}
         mobileOpen={sidebarMobileOpen}

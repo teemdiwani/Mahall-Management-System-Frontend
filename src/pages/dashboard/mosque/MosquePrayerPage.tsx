@@ -206,7 +206,7 @@ export const MosquePrayerPage: React.FC = () => {
               <div className="space-y-3 divide-y divide-neutral-200 dark:divide-neutral-800">
                 <div className="pt-2 flex justify-between items-center text-sm">
                   <span className="text-neutral-500">Mosque Name</span>
-                  <span className="font-semibold text-neutral-900 dark:text-white">{mosque?.name || 'Al-Noor Central Masjid'}</span>
+                  <span className="font-semibold text-neutral-900 dark:text-white">{mosque?.name || 'Noorul Huda Central Juma Masjid, Odamala'}</span>
                 </div>
                 <div className="pt-3 flex justify-between items-center text-sm">
                   <span className="text-neutral-500">Chief Imam</span>

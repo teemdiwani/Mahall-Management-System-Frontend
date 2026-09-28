@@ -25,8 +25,8 @@ const Card: React.FC<CardProps> = ({
   return (
     <div
       onClick={onClick}
-      className={`bg-white rounded-2xl border border-gray-100 shadow-sm min-w-0
-        ${hover ? 'hover:shadow-md hover:border-gray-200 cursor-pointer transition-all duration-200' : ''}
+      className={`bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm min-w-0 transition-colors
+        ${hover ? 'hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 cursor-pointer transition-all duration-200' : ''}
         ${paddingClasses[padding]}
         ${className}`}
     >
@@ -40,7 +40,7 @@ export const CardHeader: React.FC<{ children: React.ReactNode; className?: strin
 );
 
 export const CardTitle: React.FC<{ children: React.ReactNode; className?: string }> = ({ children, className = '' }) => (
-  <h3 className={`text-base font-semibold text-gray-800 ${className}`}>{children}</h3>
+  <h3 className={`text-base font-semibold text-gray-800 dark:text-gray-100 ${className}`}>{children}</h3>
 );
 
 export default Card;
