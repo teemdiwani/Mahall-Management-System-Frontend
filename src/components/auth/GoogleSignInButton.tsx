@@ -22,14 +22,10 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // 1. Fetch Google Client ID if not defined in Vite env
+  // 1. Fetch Google Client ID from backend to ensure frontend and backend are always in sync
   useEffect(() => {
     let isMounted = true;
     const loadConfig = async () => {
-      if (clientId && clientId.length > 5) {
-        setIsInitializing(false);
-        return;
-      }
       try {
         const res = await authApi.getAuthConfig();
         if (isMounted && res.data?.googleClientId) {
@@ -42,11 +38,14 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       }
     };
 
+    if (clientId && clientId.length > 5) {
+      setIsInitializing(false);
+    }
     loadConfig();
     return () => {
       isMounted = false;
     };
-  }, [clientId]);
+  }, []);
 
   // 2. Poll/wait for window.google to be available
   useEffect(() => {
